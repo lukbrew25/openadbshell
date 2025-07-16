@@ -6,6 +6,7 @@ This script is a simple command-line interface for interacting with ADB (Android
 import subprocess
 import sys
 import os
+from time import sleep
 
 def run_and_stream_command(command):
     """
@@ -43,6 +44,7 @@ print("https://github.com/lukbrew25/openadbshell")
 print("--------------------------------------------")
 if not os.path.exists("adb\\adb.exe"):
     print("ADB executable not found in 'adb' directory. Please ensure you have the android platform tools files in the adb folder.")
+    sleep(5)
     sys.exit(1)
 run_and_stream_command("adb\\adb.exe version")
 print("--------------------------------------------")
