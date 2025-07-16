@@ -1,7 +1,7 @@
 """
 This script is a simple command-line interface for interacting with ADB (Android Debug Bridge).
 """
-# pyinstaller --icon openadbshell.ico openadbshell.py
+# pyinstaller --icon openadbshell.ico --add-data "LICENSE;." --add-data "README.MD;." --add-data "contributing.md;." openadbshell.py
 # ico file not included in the repository, please create your own icon file and use it with the --icon flag.
 import subprocess
 import sys
