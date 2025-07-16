@@ -1,8 +1,11 @@
 """
-This script is a simple command-line interface for interacting with ADB (Android Debug Bridge).
+This script is a simple command-line interface for
+interacting with ADB (Android Debug Bridge).
 """
-# pyinstaller --icon openadbshell.ico --add-data "LICENSE;." --add-data "README.MD;." --add-data "contributing.md;." openadbshell.py
-# ico file not included in the repository, please create your own icon file and use it with the --icon flag.
+# pyinstaller --icon openadbshell.ico --add-data "LICENSE;."
+# --add-data "README.MD;." --add-data "contributing.md;." openadbshell.py
+# ico file not included in the repository, please create your own icon file
+# and use it with the --icon flag.
 import subprocess
 import sys
 import os
@@ -36,14 +39,16 @@ def run_and_stream_command(command):
         print(f"An error occurred: {e}")
 
 print("Welcome to the OpenADB Shell! (v1.0.1)")
-print("Type 'help' for a list of shell-specific commands or type standard adb commands directly without the adb.exe prefix.")
+print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
+      "without the adb.exe prefix.")
 print("--------------------------------------------")
 print("Created by lukbrew25")
 print("Fully open source software, available on GitHub")
 print("https://github.com/lukbrew25/openadbshell")
 print("--------------------------------------------")
 if not os.path.exists("adb\\adb.exe"):
-    print("ADB executable not found in 'adb' directory. Please ensure you have the android platform tools files in the adb folder.")
+    print("ADB executable not found in 'adb' directory. Please ensure you have the android "
+          "platform tools files in the adb folder.")
     sleep(5)
     sys.exit(1)
 run_and_stream_command("adb\\adb.exe version")
@@ -52,7 +57,8 @@ print("--------------------------------------------")
 while True:
     user_command = str(input("openadbshell:"))
     if user_command.lower() == "exit":
-        disconnect = input("Would you like to disconnect from all devices before exiting? (y/n): ")
+        disconnect = input("Would you like to disconnect from all devices before "
+                           "exiting? (y/n): ")
         if disconnect.lower() == 'y':
             run_and_stream_command("adb\\adb.exe disconnect")
         print("Exiting adb shell.")
@@ -67,7 +73,8 @@ while True:
         print("  installedapps - List installed apps on connected devices")
         print("  apppath <com.example.example> - Show the path to the adb file")
         print("  localconnect <port as int> - Connect to a local adb server by only port")
-        print("  localdisconnect <port as int> - Disconnect from a local adb server by only port")
+        print("  localdisconnect <port as int> - Disconnect from "
+              "a local adb server by only port")
         print("  wsaconnect - Connect to local default WSA adb port (58526).")
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
         print("  <adb command> - Execute an adb command")
