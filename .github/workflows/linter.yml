@@ -1,0 +1,36 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        pylint $(git ls-files '*.py')
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --statistics
+    - name: Clean up
+      run: |
+        find . -name '*.pyc' -delete
+        find . -name '__pycache__' -delete
+        find . -name '*.egg-info' -delete
+        find . -name '*.dist-info' -delete
+        find . -name '.pytest_cache' -delete
+        find . -name '.coverage' -delete
+        find . -name 'coverage.xml' -delete
+        find . -name 'htmlcov' -type d -exec rm -rf {} +
