@@ -1,5 +1,8 @@
 This is an open source adb shell for Windows only.
 
+<img width="2177" height="1202" alt="image" src="https://github.com/user-attachments/assets/aeb1044a-9861-424f-be07-15fd2a5d7810" />
+
+
 Instructions:
 1. Grab the zip from the latest release.
 2. Unzip the file directly into an area of your user's directory - I recommend unzipping the file into your documents folder.
