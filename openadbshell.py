@@ -11,6 +11,7 @@ import sys
 import os
 from time import sleep
 
+
 def run_and_stream_command(command):
     """
     Executes a given command and streams its stdout and stderr to the console.
@@ -37,6 +38,7 @@ def run_and_stream_command(command):
         process.wait()
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 print("Welcome to the OpenADB Shell! (v1.0.1)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
