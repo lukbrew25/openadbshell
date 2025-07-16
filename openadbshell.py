@@ -1,3 +1,8 @@
+"""
+This script is a simple command-line interface for interacting with ADB (Android Debug Bridge).
+"""
+# pyinstaller --icon openadbshell.ico openadbshell.py
+# ico file not included in the repository, please create your own icon file and use it with the --icon flag.
 import subprocess
 import sys
 import os
@@ -29,8 +34,8 @@ def run_and_stream_command(command):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-print("Welcome to the OpenADB Shell!")
-print("Type 'help' for a list of commands or type standard adb commands directly without the adb prefix.")
+print("Welcome to the OpenADB Shell! (v1.0.1)")
+print("Type 'help' for a list of shell-specific commands or type standard adb commands directly without the adb.exe prefix.")
 print("--------------------------------------------")
 print("Created by lukbrew25")
 print("Fully open source software, available on GitHub")
@@ -45,6 +50,9 @@ print("--------------------------------------------")
 while True:
     user_command = str(input("openadbshell:"))
     if user_command.lower() == "exit":
+        disconnect = input("Would you like to disconnect from all devices before exiting? (y/n): ")
+        if disconnect.lower() == 'y':
+            run_and_stream_command("adb\\adb.exe disconnect")
         print("Exiting adb shell.")
         sys.exit(0)
     elif user_command.lower() == "clear":
@@ -54,21 +62,35 @@ while True:
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
-        print("  localconnect - Connect to a local adb server by only port")
-        print("  localdisconnect - Disconnect from a local adb server by only port")
+        print("  installedapps - List installed apps on connected devices")
+        print("  apppath <com.example.example> - Show the path to the adb file")
+        print("  localconnect <port as int> - Connect to a local adb server by only port")
+        print("  localdisconnect <port as int> - Disconnect from a local adb server by only port")
         print("  wsaconnect - Connect to local default WSA adb port (58526).")
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
         print("  <adb command> - Execute an adb command")
-    elif user_command.lower ()== "localconnect":
-        port = input("Enter the port to connect to (default 5037): ")
-        if not port.strip():
-            port = "5037"
+    elif user_command.lower() == "installedapps":
+        run_command = "adb\\adb.exe shell pm list packages"
+        run_and_stream_command(run_command)
+    elif user_command.startswith("apppath "):
+        package_name = user_command[8:].strip()
+        if not package_name:
+            print("Error: Please provide a package name.")
+            continue
+        run_command = "adb\\adb.exe shell pm path " + str(package_name)
+        run_and_stream_command(run_command)
+    elif user_command.lower().startswith("localconnect "):
+        port = user_command[13:].strip()
+        if not port.isdigit():
+            print("Error: Please provide a valid port number.")
+            continue
         run_command = "adb\\adb.exe connect localhost:" + str(port)
         run_and_stream_command(run_command)
-    elif user_command.lower() == "localdisconnect":
-        port = input("Enter the port to disconnect from (default 5037): ")
-        if not port.strip():
-            port = "5037"
+    elif user_command.lower().startswith("localdisconnect "):
+        port = user_command[16:].strip()
+        if not port.isdigit():
+            print("Error: Please provide a valid port number.")
+            continue
         run_command = "adb\\adb.exe disconnect localhost:" + str(port)
         run_and_stream_command(run_command)
     elif user_command.lower() == "wsaconnect":
