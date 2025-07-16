@@ -1,0 +1,8 @@
+/adb
+/.venv
+openadbshell.ico
+openadbshell.png
+/dist
+/.idea
+/build
+openadbshell.spec
