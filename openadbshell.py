@@ -73,7 +73,7 @@ while True:
         print("  clear - Clear the console")
         print("  help - Show this help message")
         print("  installedapps - List installed apps on connected devices")
-        print("  apppath <com.example.example> - Show the path to the adb file")
+        print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port as int> - Connect to a local adb server by only port")
         print("  localdisconnect <port as int> - Disconnect from "
               "a local adb server by only port")
