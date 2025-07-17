@@ -14,6 +14,35 @@ import tkinter as tk
 from tkinter import BooleanVar
 
 
+def save_config():
+    """Save configuration to config.dat file."""
+    try:
+        with open("config.dat", "w", encoding="utf-8") as f:
+            f.write(f"do_cust_command={do_cust_command}\n")
+    except Exception as e:
+        print(f"Error saving config: {e}")
+
+
+def load_config():
+    """Load configuration from config.dat file."""
+    global do_cust_command
+    try:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("do_cust_command="):
+                        value = line.split("=", 1)[1]
+                        do_cust_command = value.lower() == "true"
+                        break
+        else:
+            # Create config file with default value if it doesn't exist
+            with open("config.dat", "w", encoding="utf-8") as f:
+                f.write("do_cust_command=True\n")
+    except Exception as e:
+        print(f"Error loading config: {e}")
+
+
 def open_config_window():
     """Opens a configuration window to enable or disable custom commands."""
     global do_cust_command
@@ -21,6 +50,7 @@ def open_config_window():
     def save_and_close():
         global do_cust_command
         do_cust_command = var.get()
+        save_config()
         config_win.destroy()
 
     config_win = tk.Tk()
@@ -72,6 +102,7 @@ def run_and_stream_command(command):
 
 
 do_cust_command = True
+load_config()
 print("Welcome to the OpenADB Shell! (v1.0.3)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
