@@ -79,6 +79,7 @@ while True:
               "a local adb server by only port")
         print("  wsaconnect - Connect to local default WSA adb port (58526).")
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
+        print("  shpm <command> - Execute a shell pm command on the device.")
         print("  <adb command> - Execute an adb command")
     elif user_command.lower() == "installedapps":
         run_command = "adb\\adb.exe shell pm list packages"
@@ -121,6 +122,9 @@ while True:
         run_and_stream_command(run_command)
     elif user_command.lower() == "disconnect wsa":
         run_command = "adb\\adb.exe disconnect localhost:58526"
+        run_and_stream_command(run_command)
+    elif user_command.lower().startswith("shpm"):
+        run_command = "adb\\adb.exe shell pm " + user_command[4:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
