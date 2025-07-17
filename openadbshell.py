@@ -15,6 +15,7 @@ from tkinter import BooleanVar
 
 
 def open_config_window():
+    """Opens a configuration window to enable or disable custom commands."""
     global do_cust_command
 
     def save_and_close():
