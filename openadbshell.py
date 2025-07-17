@@ -61,7 +61,7 @@ while True:
     if user_command.lower() == "exit":
         disconnect = input("Would you like to disconnect from all devices before "
                            "exiting? (y/n): ")
-        if disconnect.lower() == 'y':
+        if disconnect.lower().startswith('y'):
             run_and_stream_command("adb\\adb.exe disconnect")
         print("Exiting adb shell.")
         sys.exit(0)
