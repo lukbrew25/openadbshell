@@ -123,8 +123,8 @@ while True:
     elif user_command.lower() == "disconnect wsa":
         run_command = "adb\\adb.exe disconnect localhost:58526"
         run_and_stream_command(run_command)
-    elif user_command.lower().startswith("shpm"):
-        run_command = "adb\\adb.exe shell pm " + user_command[4:]
+    elif user_command.lower().startswith("shpm "):
+        run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
