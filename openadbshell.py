@@ -103,7 +103,7 @@ def run_and_stream_command(command):
 
 do_cust_command = True
 load_config()
-print("Welcome to the OpenADB Shell! (v1.0.3)")
+print("Welcome to the OpenADB Shell! (v1.0.4)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -195,6 +195,9 @@ while True:
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("adb.exe "):
+        run_command = "adb\\adb.exe " + user_command[8:]
         run_and_stream_command(run_command)
     else:
         run_command = "adb\\adb.exe " + user_command
