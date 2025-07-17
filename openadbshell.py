@@ -40,7 +40,7 @@ def run_and_stream_command(command):
         print(f"An error occurred: {e}")
 
 
-print("Welcome to the OpenADB Shell! (v1.0.1)")
+print("Welcome to the OpenADB Shell! (v1.0.2)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
