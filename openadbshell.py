@@ -134,7 +134,8 @@ while True:
         os.system('cls')
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
-        print("  config - Open the configuration window to enable/disable custom commands")
+        print("  config - Open the configuration window to enable/disable "
+              "custom commands *won't disable this command*")
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
