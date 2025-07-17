@@ -74,8 +74,8 @@ while True:
         print("  help - Show this help message")
         print("  installedapps - List installed apps on connected devices")
         print("  apppath <com.example.example> - Show the path to the apk file")
-        print("  localconnect <port as int> - Connect to a local adb server by only port")
-        print("  localdisconnect <port as int> - Disconnect from "
+        print("  localconnect <port> - Connect to a local adb server by only port")
+        print("  localdisconnect <port> - Disconnect from "
               "a local adb server by only port")
         print("  wsaconnect - Connect to local default WSA adb port (58526).")
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
@@ -93,21 +93,33 @@ while True:
     elif user_command.lower().startswith("localconnect "):
         port = user_command[13:].strip()
         if not port.isdigit():
-            print("Error: Please provide a valid port number.")
-            continue
+            if port.lower() == "wsa":
+                port = "58526"
+            else:
+                print("Error: Please provide a valid port number.")
+                continue
         run_command = "adb\\adb.exe connect localhost:" + str(port)
         run_and_stream_command(run_command)
     elif user_command.lower().startswith("localdisconnect "):
         port = user_command[16:].strip()
         if not port.isdigit():
-            print("Error: Please provide a valid port number.")
-            continue
+            if port.lower() == "wsa":
+                port = "58526"
+            else:
+                print("Error: Please provide a valid port number.")
+                continue
         run_command = "adb\\adb.exe disconnect localhost:" + str(port)
         run_and_stream_command(run_command)
     elif user_command.lower() == "wsaconnect":
         run_command = "adb\\adb.exe connect localhost:58526"
         run_and_stream_command(run_command)
     elif user_command.lower() == "wsadisconnect":
+        run_command = "adb\\adb.exe disconnect localhost:58526"
+        run_and_stream_command(run_command)
+    elif user_command.lower() == "connect wsa":
+        run_command = "adb\\adb.exe connect localhost:58526"
+        run_and_stream_command(run_command)
+    elif user_command.lower() == "disconnect wsa":
         run_command = "adb\\adb.exe disconnect localhost:58526"
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
