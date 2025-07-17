@@ -35,6 +35,10 @@ def load_config():
                         value = line.split("=", 1)[1]
                         do_cust_command = value.lower() == "true"
                         break
+        else:
+            # Create config file with default value if it doesn't exist
+            with open("config.dat", "w", encoding="utf-8") as f:
+                f.write("do_cust_command=True\n")
     except Exception as e:
         print(f"Error loading config: {e}")
 
