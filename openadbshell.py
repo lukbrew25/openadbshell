@@ -220,7 +220,7 @@ def open_config_window():  # pylint: disable=too-many-statements
         region = device_tree.identify_region(event.x, event.y)
         if region == "cell":
             column = device_tree.identify_column(event.x, event.y)
-            item = device_tree.identify('row', event.x, event.y)  # Fixed method call
+            item = device_tree.identify('row', event.x, event.y)
 
             if item:
                 col_index = int(column.replace('#', '')) - 1
