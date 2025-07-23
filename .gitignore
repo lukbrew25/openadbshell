@@ -6,3 +6,8 @@ openadbshell.png
 /.idea
 /build
 openadbshell.spec
+__pycache__/
+*.pyc
+*.pyo
+config.txt
+config.dat
