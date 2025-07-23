@@ -358,6 +358,7 @@ while True:
         print("  save ip:port --name <name> - Save a device connection with a name")
         print("  removesaved <name> - Remove a saved device by name")
         print("  connectsaved <name> - Connect to a saved device by name")
+        print("  disconnectsaved <name> - Disconnect from a saved device by name")
         print("  installedapps - List installed apps on connected devices")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
@@ -450,7 +451,24 @@ while True:
                         ip_port = line.split("=/!/")[1].strip()
                         run_command = f"adb\\adb.exe connect {ip_port}"
                         run_and_stream_command(run_command)
-                        f.close()
+                        break
+                else:
+                    print(f"Error: No saved device found with name '{name}'.")
+                f.close()
+        except Exception as e:
+            print(f"Error reading config.dat: {e}")
+    elif do_cust_command and user_command.lower().startswith("disconnectsaved "):
+        name = user_command[16:].strip()
+        if not name:
+            print("Error: Please provide a name for the saved device.")
+            continue
+        try:
+            with open("config.dat", "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith(f"saved_device={name}/!/"):
+                        ip_port = line.split("=/!/")[1].strip()
+                        run_command = f"adb\\adb.exe disconnect {ip_port}"
+                        run_and_stream_command(run_command)
                         break
                 else:
                     print(f"Error: No saved device found with name '{name}'.")

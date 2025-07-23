@@ -53,6 +53,7 @@ openadbshell/
 | help                         | Show this help message                             |
 | save <ip:port> --name <name> | Save the current ADB connection to a callable name |
 | connectsaved <name>          | Load a saved ADB connection by name                |
+| disconnect saved <name>      | Disconnect a saved ADB connection by name          |
 | removesaved <name>           | Remove a saved connection by name                  |
 | installedapps                | List installed apps on connected devices           |
 | apppath <package>            | Show the path to the APK file for a package        |
