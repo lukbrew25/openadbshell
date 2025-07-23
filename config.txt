@@ -1,1 +1,0 @@
-other_config=some_value
