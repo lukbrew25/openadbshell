@@ -48,11 +48,11 @@ def load_config():
 
 
 def load_saved_devices():
-    """Load saved devices from config.txt file."""
+    """Load saved devices from config.dat file."""
     saved_devices = []
     try:
-        if os.path.exists("config.txt"):
-            with open("config.txt", "r", encoding="utf-8") as config_file:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if line.startswith("saved_device="):
@@ -67,19 +67,19 @@ def load_saved_devices():
 
 
 def save_saved_devices(devices):
-    """Save devices to config.txt file, preserving other config entries."""
+    """Save devices to config.dat file, preserving other config entries."""
     try:
         # Read existing non-device config entries
         other_configs = []
-        if os.path.exists("config.txt"):
-            with open("config.txt", "r", encoding="utf-8") as config_file:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if not line.startswith("saved_device="):
                         other_configs.append(line)
 
         # Write all config entries back
-        with open("config.txt", "w", encoding="utf-8") as config_file:
+        with open("config.dat", "w", encoding="utf-8") as config_file:
             for config_line in other_configs:
                 if config_line:  # Skip empty lines
                     config_file.write(f"{config_line}\n")
@@ -93,17 +93,17 @@ def save_saved_devices(devices):
 def clear_all_saved_devices():
     """Clear all saved devices immediately."""
     try:
-        if os.path.exists("config.txt"):
+        if os.path.exists("config.dat"):
             # Read existing non-device config entries
             other_configs = []
-            with open("config.txt", "r", encoding="utf-8") as config_file:
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if not line.startswith("saved_device="):
                         other_configs.append(line)
 
             # Write back only non-device config entries
-            with open("config.txt", "w", encoding="utf-8") as config_file:
+            with open("config.dat", "w", encoding="utf-8") as config_file:
                 for config_line in other_configs:
                     if config_line:  # Skip empty lines
                         config_file.write(f"{config_line}\n")
@@ -419,7 +419,7 @@ while True:
         if not ip_port or not name:
             print("Error: Please provide both IP:port and a name.")
             continue
-        with open("config.txt", "a", encoding="utf-8") as f:
+        with open("config.dat", "a", encoding="utf-8") as f:
             f.write(f"saved_device={name}/!/{ip_port}\n")
             f.close()
     elif do_cust_command and user_command.lower().startswith("removesaved "):
@@ -428,10 +428,10 @@ while True:
             print("Error: Please provide a name for the saved device.")
             continue
         try:
-            with open("config.txt", "r", encoding="utf-8") as f:
+            with open("config.dat", "r", encoding="utf-8") as f:
                 lines = f.readlines()
                 f.close()
-            with open("config.txt", "w", encoding="utf-8") as f:
+            with open("config.dat", "w", encoding="utf-8") as f:
                 for line in lines:
                     if not line.startswith(f"saved_device={name}/!/"):
                         f.write(line)
@@ -444,7 +444,7 @@ while True:
             print("Error: Please provide a name for the saved device.")
             continue
         try:
-            with open("config.txt", "r", encoding="utf-8") as f:
+            with open("config.dat", "r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
                         ip_port = line.split("=/!/")[1].strip()
@@ -456,7 +456,7 @@ while True:
                     print(f"Error: No saved device found with name '{name}'.")
                 f.close()
         except Exception as e:
-            print(f"Error reading config.txt: {e}")
+            print(f"Error reading config.dat: {e}")
     elif do_cust_command and user_command.lower().startswith("shpm "):
         run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
