@@ -100,6 +100,13 @@ def run_and_stream_command(command):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+try:
+    if os.path.exists("config.dat"):
+        with open("config.dat", "w", encoding="utf-8") as f:
+            f.write("do_cust_command=True\n")
+            f.close()
+except Exception as e:
+    print(f"Error creating config file: {e}")
 
 do_cust_command = True
 load_config()
