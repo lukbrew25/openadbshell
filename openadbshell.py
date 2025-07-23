@@ -229,7 +229,10 @@ def open_config_window():
 
     def edit_cell(item, col_index):
         """Create an entry widget to edit the cell."""
-        x, y, width, height = device_tree.bbox(item, column=col_index)
+        bbox = device_tree.bbox(item, column=col_index)
+        if not bbox:
+            return
+        x, y, width, height = bbox
 
         current_value = device_tree.item(item, 'values')[col_index]
 
