@@ -113,7 +113,7 @@ def clear_all_saved_devices():
         return False
 
 
-def open_config_window():
+def open_config_window():  # pylint: disable=too-many-statements
     """Opens a configuration window to manage settings and saved devices."""
     global do_cust_command
 
@@ -220,7 +220,7 @@ def open_config_window():
         region = device_tree.identify_region(event.x, event.y)
         if region == "cell":
             column = device_tree.identify_column(event.x, event.y)
-            item = device_tree.identify_row(event.y)
+            item = device_tree.identify('row', event.x, event.y)  # Fixed method call
 
             if item:
                 col_index = int(column.replace('#', '')) - 1
@@ -244,14 +244,14 @@ def open_config_window():
         entry.insert(0, current_value)
         entry.focus()
 
-        def save_edit(event=None):
+        def save_edit(event=None):  # pylint: disable=unused-argument
             new_value = entry.get()
             values = list(device_tree.item(item, 'values'))
             values[col_index] = new_value
             device_tree.item(item, values=values)
             entry.destroy()
 
-        def cancel_edit(event=None):
+        def cancel_edit(event=None):  # pylint: disable=unused-argument
             entry.destroy()
 
         entry.bind('<Return>', save_edit)
