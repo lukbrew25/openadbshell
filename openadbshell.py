@@ -17,8 +17,9 @@ from tkinter import BooleanVar
 def save_config():
     """Save configuration to config.dat file."""
     try:
-        with open("config.dat", "w", encoding="utf-8") as f:
-            f.write(f"do_cust_command={do_cust_command}\n")
+        with open("config.dat", "w", encoding="utf-8") as config_file:
+            config_file.write(f"do_cust_command={do_cust_command}\n")
+            config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
 
@@ -28,17 +29,19 @@ def load_config():
     global do_cust_command
     try:
         if os.path.exists("config.dat"):
-            with open("config.dat", "r", encoding="utf-8") as f:
-                for line in f:
+            with open("config.dat", "r", encoding="utf-8") as config_file:
+                for line in config_file:
                     line = line.strip()
                     if line.startswith("do_cust_command="):
                         value = line.split("=", 1)[1]
                         do_cust_command = value.lower() == "true"
+                        config_file.close()
                         break
         else:
             # Create config file with default value if it doesn't exist
-            with open("config.dat", "w", encoding="utf-8") as f:
-                f.write("do_cust_command=True\n")
+            with open("config.dat", "w", encoding="utf-8") as config_file:
+                config_file.write("do_cust_command=True\n")
+                config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
 
