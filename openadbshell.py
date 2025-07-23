@@ -149,6 +149,9 @@ while True:
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
+        print("  save ip:port --name <name> - Save a device connection with a name")
+        print("  removesaved <name> - Remove a saved device by name")
+        print("  connectsaved <name> - Connect to a saved device by name")
         print("  installedapps - List installed apps on connected devices")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
@@ -200,6 +203,54 @@ while True:
     elif do_cust_command and user_command.lower() == "disconnect wsa":
         run_command = "adb\\adb.exe disconnect localhost:58526"
         run_and_stream_command(run_command)
+    elif do_cust_command and user_command.lower().startswith("save "):
+        parts = user_command[5:].strip().split("--name")
+        if len(parts) != 2:
+            print("Error: Please provide an IP:port and a name for the saved device.")
+            continue
+        ip_port = parts[0].strip()
+        name = parts[1].strip()
+        if not ip_port or not name:
+            print("Error: Please provide both IP:port and a name.")
+            continue
+        with open("config.txt", "a", encoding="utf-8") as f:
+            f.write(f"saved_device={name}/!/{ip_port}\n")
+            f.close()
+    elif do_cust_command and user_command.lower().startswith("removesaved "):
+        name = user_command[10:].strip()
+        if not name:
+            print("Error: Please provide a name for the saved device.")
+            continue
+        try:
+            with open("config.txt", "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                f.close()
+            with open("config.txt", "w", encoding="utf-8") as f:
+                for line in lines:
+                    if not line.startswith(f"saved_device={name}/!/"):
+                        f.write(line)
+            print(f"Removed saved device '{name}'.")
+        except Exception as e:
+            print(f"Error removing saved device: {e}")
+    elif do_cust_command and user_command.lower().startswith("connectsaved "):
+        name = user_command[13:].strip()
+        if not name:
+            print("Error: Please provide a name for the saved device.")
+            continue
+        try:
+            with open("config.txt", "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith(f"saved_device={name}/!/"):
+                        ip_port = line.split("=/!/")[1].strip()
+                        run_command = f"adb\\adb.exe connect {ip_port}"
+                        run_and_stream_command(run_command)
+                        f.close()
+                        break
+                else:
+                    print(f"Error: No saved device found with name '{name}'.")
+                f.close()
+        except Exception as e:
+            print(f"Error reading config.txt: {e}")
     elif do_cust_command and user_command.lower().startswith("shpm "):
         run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
