@@ -234,7 +234,10 @@ def open_config_window():
             return
         x, y, width, height = bbox
 
-        current_value = device_tree.item(item, 'values')[col_index]
+        values = device_tree.item(item, 'values')
+        if col_index >= len(values):
+            return
+        current_value = values[col_index]
 
         entry = tk.Entry(device_tree)
         entry.place(x=x, y=y, width=width, height=height)
