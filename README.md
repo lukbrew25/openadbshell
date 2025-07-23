@@ -41,7 +41,7 @@ openadbshell/
 ## Usage
 - Type `help` for a list of available custom commands.
 - Type any standard ADB command (without the `adb.exe` prefix) to run it directly.
-- Type `config` to open the configuration window and enable/disable custom commands.
+- Type `config` to open the configuration window and enable/disable custom commands and manage custom devices saved.
 - If custom commands are disabled, only standard ADB commands will work (except `config`).
 
 ## Available Shell-Specific Commands (run help for more info)
