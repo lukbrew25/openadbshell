@@ -219,7 +219,7 @@ def open_config_window():  # pylint: disable=too-many-statements
         """Handle double-click to edit cells."""
         region = device_tree.identify_region(event.x, event.y)
         if region == "cell":
-            column = device_tree.identify_column(event.x, event.y)
+            column = device_tree.identify_column(event.x)
             item = device_tree.identify('row', event.x, event.y)
 
             if item:
