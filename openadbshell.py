@@ -11,7 +11,8 @@ import sys
 import os
 from time import sleep
 import tkinter as tk
-from tkinter import BooleanVar
+from tkinter import BooleanVar, messagebox
+from tkinter import ttk
 
 
 def save_config():
@@ -46,32 +47,230 @@ def load_config():
         print(f"Error loading config: {e}")
 
 
+def load_saved_devices():
+    """Load saved devices from config.txt file."""
+    saved_devices = []
+    try:
+        if os.path.exists("config.txt"):
+            with open("config.txt", "r", encoding="utf-8") as config_file:
+                for line in config_file:
+                    line = line.strip()
+                    if line.startswith("saved_device="):
+                        # Format: saved_device=name/!/ip:port
+                        device_data = line.split("=", 1)[1]
+                        if "/!/" in device_data:
+                            name, ip_port = device_data.split("/!/", 1)
+                            saved_devices.append({"name": name, "ip_port": ip_port})
+    except Exception as e:
+        print(f"Error loading saved devices: {e}")
+    return saved_devices
+
+
+def save_saved_devices(devices):
+    """Save devices to config.txt file, preserving other config entries."""
+    try:
+        # Read existing non-device config entries
+        other_configs = []
+        if os.path.exists("config.txt"):
+            with open("config.txt", "r", encoding="utf-8") as config_file:
+                for line in config_file:
+                    line = line.strip()
+                    if not line.startswith("saved_device="):
+                        other_configs.append(line)
+
+        # Write all config entries back
+        with open("config.txt", "w", encoding="utf-8") as config_file:
+            for config_line in other_configs:
+                if config_line:  # Skip empty lines
+                    config_file.write(f"{config_line}\n")
+            for device in devices:
+                config_file.write(f"saved_device={device['name']}/!/"
+                                  f"{device['ip_port']}\n")
+    except Exception as e:
+        print(f"Error saving devices: {e}")
+
+
+def clear_all_saved_devices():
+    """Clear all saved devices immediately."""
+    try:
+        if os.path.exists("config.txt"):
+            # Read existing non-device config entries
+            other_configs = []
+            with open("config.txt", "r", encoding="utf-8") as config_file:
+                for line in config_file:
+                    line = line.strip()
+                    if not line.startswith("saved_device="):
+                        other_configs.append(line)
+
+            # Write back only non-device config entries
+            with open("config.txt", "w", encoding="utf-8") as config_file:
+                for config_line in other_configs:
+                    if config_line:  # Skip empty lines
+                        config_file.write(f"{config_line}\n")
+        return True
+    except Exception as e:
+        print(f"Error clearing saved devices: {e}")
+        return False
+
+
 def open_config_window():
-    """Opens a configuration window to enable or disable custom commands."""
+    """Opens a configuration window to manage settings and saved devices."""
     global do_cust_command
 
     def save_and_close():
         global do_cust_command
         do_cust_command = var.get()
         save_config()
+
+        # Save devices from the table
+        devices = []
+        for item in device_tree.get_children():
+            values = device_tree.item(item, 'values')
+            if len(values) >= 2 and values[0] and values[1]:
+                devices.append({"name": values[0], "ip_port": values[1]})
+        save_saved_devices(devices)
+
         config_win.destroy()
+
+    def clear_all_devices():
+        """Clear all saved devices immediately."""
+        result = messagebox.askyesno("Confirm Clear",
+                                     "Are you sure you want to clear all saved "
+                                     "devices? This action cannot be undone.")
+        if result:
+            if clear_all_saved_devices():
+                # Clear the tree view
+                for item in device_tree.get_children():
+                    device_tree.delete(item)
+                messagebox.showinfo("Success",
+                                    "All saved devices have been cleared.")
+            else:
+                messagebox.showerror("Error", "Failed to clear saved devices.")
+
+    def add_device():
+        """Add a new empty row to the device table."""
+        device_tree.insert('', 'end', values=('', ''))
+
+    def delete_selected_device():
+        """Delete the selected device from the table."""
+        selected_items = device_tree.selection()
+        for item in selected_items:
+            device_tree.delete(item)
 
     config_win = tk.Tk()
     config_win.title("OpenADB Config")
-    config_win.geometry("300x120")
+    config_win.geometry("600x500")
+    config_win.resizable(True, True)
+
+    # Custom commands section
+    cmd_frame = tk.Frame(config_win)
+    cmd_frame.pack(fill=tk.X, padx=10, pady=5)
+
     var = BooleanVar(value=do_cust_command)
+    chk = tk.Checkbutton(cmd_frame, text="Enable custom command set", variable=var)
+    chk.pack(anchor=tk.W)
 
-    chk = tk.Checkbutton(config_win, text="Enable custom command set", variable=var)
-    chk.pack(pady=10)
+    # Saved devices section
+    devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
+    devices_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
+    # Device table
+    columns = ('Name', 'IP:Port')
+    device_tree = ttk.Treeview(devices_frame, columns=columns, show='headings',
+                               height=10)
+
+    # Configure columns
+    device_tree.heading('Name', text='Device Name')
+    device_tree.heading('IP:Port', text='IP Address:Port')
+    device_tree.column('Name', width=200)
+    device_tree.column('IP:Port', width=200)
+
+    # Scrollbar for the tree
+    scrollbar = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL,
+                              command=device_tree.yview)
+    device_tree.configure(yscrollcommand=scrollbar.set)
+
+    # Pack tree and scrollbar
+    device_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    # Load existing saved devices
+    saved_devices = load_saved_devices()
+    for device in saved_devices:
+        device_tree.insert('', 'end', values=(device['name'], device['ip_port']))
+
+    # Device management buttons
+    device_btn_frame = tk.Frame(devices_frame)
+    device_btn_frame.pack(fill=tk.X, pady=5)
+
+    add_btn = tk.Button(device_btn_frame, text="Add Device", command=add_device)
+    add_btn.pack(side=tk.LEFT, padx=5)
+
+    delete_btn = tk.Button(device_btn_frame, text="Delete Selected",
+                           command=delete_selected_device)
+    delete_btn.pack(side=tk.LEFT, padx=5)
+
+    clear_btn = tk.Button(device_btn_frame, text="Clear All (Immediate)",
+                          command=clear_all_devices, bg='#ffcccc')
+    clear_btn.pack(side=tk.LEFT, padx=5)
+
+    # Make cells editable
+    def on_double_click(event):
+        """Handle double-click to edit cells."""
+        region = device_tree.identify_region(event.x, event.y)
+        if region == "cell":
+            column = device_tree.identify_column(event.x, event.y)
+            item = device_tree.identify_row(event.y)
+
+            if item:
+                col_index = int(column.replace('#', '')) - 1
+                if col_index in [0, 1]:  # Only allow editing Name and IP:Port
+                    edit_cell(item, col_index)
+
+    def edit_cell(item, col_index):
+        """Create an entry widget to edit the cell."""
+        x, y, width, height = device_tree.bbox(item, column=col_index)
+
+        current_value = device_tree.item(item, 'values')[col_index]
+
+        entry = tk.Entry(device_tree)
+        entry.place(x=x, y=y, width=width, height=height)
+        entry.insert(0, current_value)
+        entry.focus()
+
+        def save_edit(event=None):
+            new_value = entry.get()
+            values = list(device_tree.item(item, 'values'))
+            values[col_index] = new_value
+            device_tree.item(item, values=values)
+            entry.destroy()
+
+        def cancel_edit(event=None):
+            entry.destroy()
+
+        entry.bind('<Return>', save_edit)
+        entry.bind('<Escape>', cancel_edit)
+        entry.bind('<FocusOut>', save_edit)
+
+    device_tree.bind('<Double-1>', on_double_click)
+
+    # Bottom buttons
     btn_frame = tk.Frame(config_win)
-    btn_frame.pack(pady=10)
+    btn_frame.pack(fill=tk.X, padx=10, pady=10)
 
     save_btn = tk.Button(btn_frame, text="Save", command=save_and_close)
-    save_btn.pack(side=tk.LEFT, padx=10)
+    save_btn.pack(side=tk.LEFT, padx=5)
 
-    exit_btn = tk.Button(btn_frame, text="Exit", command=config_win.destroy)
-    exit_btn.pack(side=tk.LEFT, padx=10)
+    exit_btn = tk.Button(btn_frame, text="Cancel", command=config_win.destroy)
+    exit_btn.pack(side=tk.LEFT, padx=5)
+
+    # Instructions
+    instructions = tk.Label(config_win,
+                            text="Double-click cells to edit. Use 'Save' to "
+                                 "apply table changes, 'Clear All' takes "
+                                 "immediate effect.",
+                            font=('Arial', 8), fg='gray')
+    instructions.pack(side=tk.BOTTOM, pady=5)
 
     config_win.mainloop()
 
@@ -102,6 +301,7 @@ def run_and_stream_command(command):
         process.wait()
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 try:
     if os.path.exists("config.dat"):
