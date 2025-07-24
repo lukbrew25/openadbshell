@@ -310,7 +310,7 @@ def run_and_stream_command(command):
 
 
 try:
-    if os.path.exists("config.dat"):
+    if not os.path.exists("config.dat"):
         with open("config.dat", "w", encoding="utf-8") as f:
             f.write("do_cust_command=True\n")
             f.close()
@@ -448,10 +448,12 @@ while True:
             with open("config.dat", "r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
-                        ip_port = line.split("=/!/")[1].strip()
-                        run_command = f"adb\\adb.exe connect {ip_port}"
-                        run_and_stream_command(run_command)
-                        break
+                        parts = line.strip().split("/!/")
+                        if len(parts) == 2:
+                            ip_port = parts[1]
+                            run_command = f"adb\\adb.exe connect {ip_port}"
+                            run_and_stream_command(run_command)
+                            break
                 else:
                     print(f"Error: No saved device found with name '{name}'.")
                 f.close()
@@ -466,10 +468,12 @@ while True:
             with open("config.dat", "r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
-                        ip_port = line.split("=/!/")[1].strip()
-                        run_command = f"adb\\adb.exe disconnect {ip_port}"
-                        run_and_stream_command(run_command)
-                        break
+                        parts = line.strip().split("/!/")
+                        if len(parts) == 2:
+                            ip_port = parts[1]
+                            run_command = f"adb\\adb.exe disconnect {ip_port}"
+                            run_and_stream_command(run_command)
+                            break
                 else:
                     print(f"Error: No saved device found with name '{name}'.")
                 f.close()
