@@ -63,11 +63,21 @@ def load_saved_devices():
                 for line in config_file:
                     line = line.strip()
                     if line.startswith("saved_device="):
-                        # Format: saved_device=name/!/ip:port
+                        # Format: saved_device=name/!/ip:port or saved_device=name/!/ip:port/!/autoconnect
                         device_data = line.split("=", 1)[1]
                         if "/!/" in device_data:
-                            name, ip_port = device_data.split("/!/", 1)
-                            saved_devices.append({"name": name, "ip_port": ip_port})
+                            parts = device_data.split("/!/")
+                            if len(parts) >= 2:
+                                name, ip_port = parts[0], parts[1]
+                                # Check for autoconnect flag (backward compatibility)
+                                autoconnect = False
+                                if len(parts) >= 3:
+                                    autoconnect = parts[2].lower() == "true"
+                                saved_devices.append({
+                                    "name": name,
+                                    "ip_port": ip_port,
+                                    "autoconnect": autoconnect
+                                })
     except Exception as e:
         print(f"Error loading saved devices: {e}")
     return saved_devices
@@ -91,8 +101,9 @@ def save_saved_devices(devices):
                 if config_line:  # Skip empty lines
                     config_file.write(f"{config_line}\n")
             for device in devices:
+                autoconnect_str = "True" if device.get('autoconnect', False) else "False"
                 config_file.write(f"saved_device={device['name']}/!/"
-                                  f"{device['ip_port']}\n")
+                                  f"{device['ip_port']}/!/{autoconnect_str}\n")
     except Exception as e:
         print(f"Error saving devices: {e}")
 
@@ -137,7 +148,14 @@ def open_config_window():  # pylint: disable=too-many-statements
         for item in device_tree.get_children():
             values = device_tree.item(item, 'values')
             if len(values) >= 2 and values[0] and values[1]:
-                devices.append({"name": values[0], "ip_port": values[1]})
+                autoconnect = False
+                if len(values) >= 3:
+                    autoconnect = values[2].upper() == 'Y'
+                devices.append({
+                    "name": values[0],
+                    "ip_port": values[1],
+                    "autoconnect": autoconnect
+                })
         save_saved_devices(devices)
 
         config_win.destroy()
@@ -159,7 +177,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     def add_device():
         """Add a new empty row to the device table."""
-        device_tree.insert('', 'end', values=('', ''))
+        device_tree.insert('', 'end', values=('', '', 'N'))
 
     def delete_selected_device():
         """Delete the selected device from the table."""
@@ -190,15 +208,17 @@ def open_config_window():  # pylint: disable=too-many-statements
     devices_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
     # Device table
-    columns = ('Name', 'IP:Port')
+    columns = ('Name', 'IP:Port', 'Autoconnect')
     device_tree = ttk.Treeview(devices_frame, columns=columns, show='headings',
                                height=10)
 
     # Configure columns
     device_tree.heading('Name', text='Device Name')
     device_tree.heading('IP:Port', text='IP Address:Port')
-    device_tree.column('Name', width=200)
-    device_tree.column('IP:Port', width=200)
+    device_tree.heading('Autoconnect', text='Autoconnect')
+    device_tree.column('Name', width=150)
+    device_tree.column('IP:Port', width=150)
+    device_tree.column('Autoconnect', width=100)
 
     # Scrollbar for the tree
     scrollbar = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL,
@@ -212,7 +232,8 @@ def open_config_window():  # pylint: disable=too-many-statements
     # Load existing saved devices
     saved_devices = load_saved_devices()
     for device in saved_devices:
-        device_tree.insert('', 'end', values=(device['name'], device['ip_port']))
+        autoconnect_display = "Y" if device.get('autoconnect', False) else "N"
+        device_tree.insert('', 'end', values=(device['name'], device['ip_port'], autoconnect_display))
 
     # Device management buttons
     device_btn_frame = tk.Frame(devices_frame)
@@ -239,7 +260,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
             if item:
                 col_index = int(column.replace('#', '')) - 1
-                if col_index in [0, 1]:  # Only allow editing Name and IP:Port
+                if col_index in [0, 1, 2]:  # Allow editing Name, IP:Port, and Autoconnect
                     edit_cell(item, col_index)
 
     def edit_cell(item, col_index):
@@ -254,6 +275,15 @@ def open_config_window():  # pylint: disable=too-many-statements
             return
         current_value = values[col_index]
 
+        # Special handling for autoconnect column (toggle Y/N)
+        if col_index == 2:  # Autoconnect column
+            new_value = 'Y' if current_value.upper() != 'Y' else 'N'
+            values = list(device_tree.item(item, 'values'))
+            values[col_index] = new_value
+            device_tree.item(item, values=values)
+            return
+
+        # Regular text entry for other columns
         entry = tk.Entry(device_tree)
         entry.place(x=x, y=y, width=width, height=height)
         entry.insert(0, current_value)
@@ -294,6 +324,24 @@ def open_config_window():  # pylint: disable=too-many-statements
     instructions.pack(side=tk.BOTTOM, pady=5)
 
     config_win.mainloop()
+
+
+def autoconnect_on_startup():
+    """Connect to devices with autoconnect enabled on startup."""
+    global devices
+    try:
+        saved_devices = load_saved_devices()
+        for device in saved_devices:
+            if device.get('autoconnect', False):
+                print(f"Auto-connecting to {device['name']} ({device['ip_port']})...")
+                run_command = f"adb\\adb.exe connect {device['ip_port']}"
+                if run_and_stream_command(run_command):
+                    devices += 1
+                    print(f"Successfully auto-connected to {device['name']}")
+                else:
+                    print(f"Failed to auto-connect to {device['name']}")
+    except Exception as e:
+        print(f"Error during autoconnect: {e}")
 
 
 def do_rich_presence(enabled_rich_presence):
@@ -385,6 +433,10 @@ if not os.path.exists("adb\\adb.exe"):
     sleep(5)
     sys.exit(1)
 run_and_stream_command("adb\\adb.exe version")
+print("--------------------------------------------")
+
+# Auto-connect to saved devices with autoconnect enabled
+autoconnect_on_startup()
 print("--------------------------------------------")
 
 while True:
@@ -486,7 +538,7 @@ while True:
             print("Error: Please provide both IP:port and a name.")
             continue
         with open("config.dat", "a", encoding="utf-8") as f:
-            f.write(f"saved_device={name}/!/{ip_port}\n")
+            f.write(f"saved_device={name}/!/{ip_port}/!/False\n")
             f.close()
     elif do_cust_command and user_command.lower().startswith("removesaved "):
         name = user_command[10:].strip()
@@ -514,7 +566,7 @@ while True:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
                         parts = line.strip().split("/!/")
-                        if len(parts) == 2:
+                        if len(parts) >= 2:
                             ip_port = parts[1]
                             run_command = f"adb\\adb.exe connect {ip_port}"
                             run_and_stream_command(run_command)
@@ -534,7 +586,7 @@ while True:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
                         parts = line.strip().split("/!/")
-                        if len(parts) == 2:
+                        if len(parts) >= 2:
                             ip_port = parts[1]
                             run_command = f"adb\\adb.exe disconnect {ip_port}"
                             run_and_stream_command(run_command)
