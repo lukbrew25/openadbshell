@@ -1,5 +1,6 @@
 from time import time, sleep
 import os
+import sys
 import datetime
 from threading import Thread
 from pypresence import Presence
@@ -22,7 +23,7 @@ def update_vars():
                     running_time = datetime.datetime.strptime(running, "%Y-%m-%d %H:%M:%S.%f")
                     current_time = datetime.datetime.now()
                     if (current_time - running_time).total_seconds() > 30:
-                        exit(0)
+                        sys.exit(0)
             sleep(15)
     except Exception as e:
         print(f"Error reading files: {e}")
