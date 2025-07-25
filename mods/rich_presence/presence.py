@@ -12,10 +12,13 @@ def update_vars():
     global enabled_rich_presence, devices
     try:
         while True:
-            with open(os.path.join("mods", "rich_presence", "enabled.dat"), "r", encoding="utf-8") as datafile:
+            with open(os.path.join("mods", "rich_presence",
+                                   "enabled.dat"), "r", encoding="utf-8"
+                      ) as datafile:
                 enabled_rich_presence = datafile.read().strip() == "1"
                 datafile.close()
-            with open(os.path.join("mods", "rich_presence", "devices.dat"), "r", encoding="utf-8") as datafile:
+            with open(os.path.join("mods", "rich_presence", "devices.dat"),
+                      "r", encoding="utf-8") as datafile:
                 devices = datafile.read().strip()
                 datafile.close()
             with open(os.path.join("mods", "running.dat"), "r", encoding="utf-8") as datafile:

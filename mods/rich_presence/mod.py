@@ -1,3 +1,4 @@
+"""This module starts the Rich Presence Handler."""
 import subprocess
 import sys
 

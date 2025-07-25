@@ -432,13 +432,16 @@ except Exception as e:
 
 
 def count_connected_devices():
+    """Count the number of connected devices using adb."""
     while True:
         global devices
         try:
-            result = subprocess.run(["adb\\adb.exe", "devices"], capture_output=True, text=True)
+            result = subprocess.run(["adb\\adb.exe", "devices"], capture_output=True, text=True, check=False)
             lines = result.stdout.strip().split("\n")[1:]
-            devices = sum(1 for l in lines if l.strip() and not any(x in l for x in ["offline", "unauthorized"]))
+            devices = sum(1 for l in lines if l.strip() and
+                          not any(x in l for x in ["offline", "unauthorized"]))
         except Exception as e:
+            print(f"Error counting devices: {e}")
             devices = 0
         sleep(10)
 
