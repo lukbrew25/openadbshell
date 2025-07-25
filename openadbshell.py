@@ -317,8 +317,8 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     # Instructions
     instructions = tk.Label(config_win,
-                            text="Double-click cells to edit. Use 'Save' to "
-                                 "apply table changes, 'Clear All' takes "
+                            text="Double-click cells to edit. Click Autoconnect column to toggle Y/N. "
+                                 "Use 'Save' to apply table changes, 'Clear All' takes "
                                  "immediate effect.",
                             font=('Arial', 8), fg='gray')
     instructions.pack(side=tk.BOTTOM, pady=5)
@@ -456,7 +456,7 @@ while True:
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
         print("  config - Open the configuration window to enable/disable "
-              "custom commands *won't disable this command*")
+              "custom commands and manage saved devices with autoconnect")
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
@@ -473,6 +473,8 @@ while True:
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
         print("  shpm <command> - Execute a shell pm command on the device.")
         print("  <adb command> - Execute an adb command")
+        print("")
+        print("Note: Devices with autoconnect enabled will automatically connect on startup.")
     elif do_cust_command and user_command.lower() == "installedapps":
         run_command = "adb\\adb.exe shell pm list packages"
         run_and_stream_command(run_command)
