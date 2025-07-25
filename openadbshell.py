@@ -336,8 +336,8 @@ def autoconnect_on_startup():
                 print(f"Auto-connecting to {device['name']} ({device['ip_port']})...")
                 run_command = f"adb\\adb.exe connect {device['ip_port']}"
                 if run_and_stream_command(run_command):
-                    devices += 1
                     print(f"Successfully auto-connected to {device['name']}")
+                    devices += 1
                 else:
                     print(f"Failed to auto-connect to {device['name']}")
     except Exception as e:
