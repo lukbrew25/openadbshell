@@ -29,17 +29,17 @@ def update_vars():
 
 try:
     if not os.path.exists("enabled.dat"):
-        with open("enabled.dat", "w") as f:
+        with open("enabled.dat", "w", encoding="utf-8") as f:
             f.write("1")
             f.close()
     if not os.path.exists("devices.dat"):
-        with open("devices.dat", "w") as f:
+        with open("devices.dat", "w", encoding="utf-8") as f:
             f.write("0")
             f.close()
-    with open("enabled.dat", "r") as f:
+    with open("enabled.dat", "r", encoding="utf-8") as f:
         enabled_rich_presence = f.read().strip() == "1"
         f.close()
-    with open("devices.dat", "r") as f:
+    with open("devices.dat", "r", encoding="utf-8") as f:
         devices = f.read().strip()
         f.close()
     Thread(target=update_vars, daemon=True).start()
