@@ -13,4 +13,5 @@ mods/rich_presence/.env
 mods/rich_presence/devices.dat
 mods/rich_presence/running.dat
 mods/rich_presence/enabled.dat
+mods/rich_presence/builds
 config.dat
