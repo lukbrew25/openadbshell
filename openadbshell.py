@@ -398,13 +398,13 @@ def update_rich_presence():
     """Update Discord Rich Presence with the current device count."""
     global devices, rich_presence
     while True:
-        with open("mods/rich_presence/enabled.dat", "w") as f:
+        with open("mods/rich_presence/enabled.dat", "w", encoding="utf-8") as f:
             f.write("1" if rich_presence else "0")
             f.close()
-        with open("mods/rich_presence/running.dat", "w") as f:
+        with open("mods/rich_presence/running.dat", "w", encoding="utf-8") as f:
             f.write(str(datetime.datetime.now()))
             f.close()
-        with open("mods/rich_presence/devices.dat", "w") as f:
+        with open("mods/rich_presence/devices.dat", "w", encoding="utf-8") as f:
             f.write(str(devices))
             f.close()
         sleep(10)
