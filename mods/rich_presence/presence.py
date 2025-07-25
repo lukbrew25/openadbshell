@@ -1,3 +1,4 @@
+"""OpenADB Shell Rich Presence Module"""
 from time import time, sleep
 import os
 import sys
@@ -7,6 +8,7 @@ from pypresence import Presence
 
 
 def update_vars():
+    """Update variables from files"""
     global enabled_rich_presence, devices
     try:
         while True:
