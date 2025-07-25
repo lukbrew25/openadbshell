@@ -14,7 +14,7 @@ import tkinter as tk
 from tkinter import BooleanVar, messagebox
 from tkinter import ttk
 import datetime
-from threading import Thread
+from threading import Thread, Event
 
 
 def save_config():
@@ -354,7 +354,6 @@ def autoconnect_on_startup():
                 run_command = f"adb\\adb.exe connect {device['ip_port']}"
                 if run_and_stream_command(run_command):
                     print(f"Successfully auto-connected to {device['name']}")
-                    devices += 1
                 else:
                     print(f"Failed to auto-connect to {device['name']}")
     except Exception as e:
@@ -431,13 +430,29 @@ try:
 except Exception as e:
     print(f"Error creating config file: {e}")
 
-devices = 0
+devices = 0  # Number of connected devices
+stop_device_counter = Event()
+
+def count_connected_devices():
+    global devices
+    while not stop_device_counter.is_set():
+        try:
+            result = subprocess.run(["adb/adb.exe", "devices"], capture_output=True, text=True)
+            lines = result.stdout.strip().split("\n")[1:]  # Skip the first line
+            # Count non-empty lines that don't contain 'offline' or 'unauthorized'
+            devices = sum(1 for l in lines if l.strip() and not any(x in l for x in ["offline", "unauthorized"]))
+        except Exception as e:
+            devices = 0
+        stop_device_counter.wait(10)  # Wait 10 seconds or until stopped
+
+# Start the device counter thread
+Thread(target=count_connected_devices, daemon=True).start()
 do_cust_command = True
 rich_presence = True
 do_mods = False
 load_config()
-Thread(target=update_rich_presence).start()
-Thread(target=mod_running_check).start()
+Thread(target=update_rich_presence, daemon=True).start()
+Thread(target=mod_running_check, daemon=True).start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -647,8 +662,7 @@ while True:
             run_command = "adb\\adb.exe connect " + user_command[12:]
         else:
             run_command = "adb\\adb.exe connect " + user_command[16:]
-        if run_and_stream_command(run_command):
-            devices += 1
+        run_and_stream_command(run_command)
     elif (user_command.startswith("disconnect ") or user_command.startswith("adb disconnect ")
           or user_command.startswith("adb.exe disconnect ")):
         if user_command.startswith("disconnect "):
@@ -657,9 +671,7 @@ while True:
             run_command = "adb\\adb.exe disconnect " + user_command[15:]
         else:
             run_command = "adb\\adb.exe disconnect " + user_command[19:]
-        if run_and_stream_command(run_command):
-            devices -= 1
-            devices = max(devices, 0)
+        run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
         run_and_stream_command(run_command)

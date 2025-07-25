@@ -1,5 +1,9 @@
-"""Rich presence launcher"""
-import os
+import subprocess
+import sys
 
 print("Starting Rich Presence Handler...")
-os.system("start /B presence.exe")
+subprocess.Popen(
+    ["mods\\rich_presence\\presence.exe"],
+    creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+)
+sys.exit(0)
