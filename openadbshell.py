@@ -199,7 +199,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     rich_presence_var = BooleanVar(value=rich_presence)
     rich_presence_chk = tk.Checkbutton(cmd_frame, text="Enable Rich Presence",
-                                        variable=rich_presence_var)
+                                       variable=rich_presence_var)
     rich_presence_chk.pack(anchor=tk.W)
 
     # Saved devices section
@@ -501,7 +501,7 @@ while True:
                 continue
         run_command = "adb\\adb.exe connect localhost:" + str(port)
         if run_and_stream_command(run_command):
-            devices +=1
+            devices += 1
     elif do_cust_command and user_command.lower().startswith("localdisconnect "):
         port = user_command[16:].strip()
         if not port.isdigit():
