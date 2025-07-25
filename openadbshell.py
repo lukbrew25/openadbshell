@@ -212,7 +212,7 @@ def open_config_window():  # pylint: disable=too-many-statements
     rich_presence_chk.pack(anchor=tk.W)
 
     do_mods_var = BooleanVar(value=do_mods)
-    do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (experimental)",
+    do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (unsecure)",
                                  variable=do_mods_var)
     do_mods_chk.pack(anchor=tk.W)
 
