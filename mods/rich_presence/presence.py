@@ -18,7 +18,7 @@ def update_vars():
             with open(os.path.join("mods", "rich_presence", "devices.dat"), "r", encoding="utf-8") as datafile:
                 devices = datafile.read().strip()
                 datafile.close()
-            with open(os.path.join("mods", "rich_presence", "running.dat"), "r", encoding="utf-8") as datafile:
+            with open(os.path.join("mods", "running.dat"), "r", encoding="utf-8") as datafile:
                 running = datafile.read().strip()
                 datafile.close()
                 if running:
@@ -37,7 +37,7 @@ try:
             f.write("1")
             f.close()
     if not os.path.exists(os.path.join("mods", "rich_presence", "devices.dat")):
-        with open("devices.dat", "w", encoding="utf-8") as f:
+        with open(os.path.join("mods", "rich_presence", "devices.dat"), "w", encoding="utf-8") as f:
             f.write("0")
             f.close()
     with open(os.path.join("mods", "rich_presence", "enabled.dat"), "r", encoding="utf-8") as f:

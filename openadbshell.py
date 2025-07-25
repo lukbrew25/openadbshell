@@ -430,20 +430,21 @@ try:
 except Exception as e:
     print(f"Error creating config file: {e}")
 
-devices = 0  # Number of connected devices
-stop_device_counter = Event()
 
 def count_connected_devices():
-    global devices
-    while not stop_device_counter.is_set():
+    while True:
+        global devices
         try:
-            result = subprocess.run(["adb/adb.exe", "devices"], capture_output=True, text=True)
-            lines = result.stdout.strip().split("\n")[1:]  # Skip the first line
-            # Count non-empty lines that don't contain 'offline' or 'unauthorized'
+            result = subprocess.run(["adb\\adb.exe", "devices"], capture_output=True, text=True)
+            lines = result.stdout.strip().split("\n")[1:]
             devices = sum(1 for l in lines if l.strip() and not any(x in l for x in ["offline", "unauthorized"]))
         except Exception as e:
             devices = 0
-        stop_device_counter.wait(10)  # Wait 10 seconds or until stopped
+        sleep(10)
+
+
+devices = 0  # Number of connected devices
+stop_device_counter = Event()
 
 # Start the device counter thread
 Thread(target=count_connected_devices, daemon=True).start()
