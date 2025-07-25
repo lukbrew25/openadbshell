@@ -16,6 +16,7 @@ from tkinter import ttk
 import datetime
 from threading import Thread
 
+
 def save_config():
     """Save configuration to config.dat file."""
     try:
@@ -394,6 +395,7 @@ def run_and_stream_command(command):
         print(f"An error occurred: {e}")
         return False
 
+
 def update_rich_presence():
     """Update Discord Rich Presence with the current device count."""
     global devices, rich_presence
@@ -409,6 +411,7 @@ def update_rich_presence():
             f.close()
         sleep(10)
 
+
 def mod_running_check():
     """Allow mods to check if shell is still running."""
     while True:
@@ -416,6 +419,7 @@ def mod_running_check():
             f.write(str(datetime.datetime.now()))
             f.close()
         sleep(10)
+
 
 try:
     if not os.path.exists("config.dat"):

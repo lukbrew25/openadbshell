@@ -30,6 +30,7 @@ def update_vars():
     except Exception as e:
         print(f"Error reading files: {e}")
 
+
 try:
     if not os.path.exists("enabled.dat"):
         with open("enabled.dat", "w", encoding="utf-8") as f:
