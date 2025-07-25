@@ -9,12 +9,12 @@ interacting with ADB (Android Debug Bridge).
 import subprocess
 import sys
 import os
-from time import sleep, time
+from time import sleep
 import tkinter as tk
 from tkinter import BooleanVar, messagebox
 from tkinter import ttk
-from threading import Thread
 import datetime
+from threading import Thread
 
 def save_config():
     """Save configuration to config.dat file."""
@@ -409,6 +409,14 @@ def update_rich_presence():
             f.close()
         sleep(10)
 
+def mod_running_check():
+    """Allow mods to check if shell is still running."""
+    while True:
+        with open("mods/running.dat", "w") as f:
+            f.write(str(datetime.datetime.now()))
+            f.close()
+        sleep(10)
+
 try:
     if not os.path.exists("config.dat"):
         with open("config.dat", "w", encoding="utf-8") as f:
@@ -425,6 +433,7 @@ rich_presence = True
 do_mods = False
 load_config()
 Thread(target=update_rich_presence).start()
+Thread(target=mod_running_check).start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")

@@ -1,8 +1,8 @@
-from pypresence import Presence
 from time import time, sleep
 import os
-from threading import Thread
 import datetime
+from threading import Thread
+from pypresence import Presence
 
 
 def update_vars():
