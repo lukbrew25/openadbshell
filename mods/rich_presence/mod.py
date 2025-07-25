@@ -1,3 +1,4 @@
+"""Rich presence launcher"""
 import os
 
 print("Starting Rich Presence Handler...")
