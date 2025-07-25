@@ -456,7 +456,8 @@ while True:
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
         print("  config - Open the configuration window to enable/disable "
-              "custom commands and manage saved devices with autoconnect")
+              "custom commands and manage saved devices with autoconnect. "
+              "This command will always be available")
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
