@@ -412,7 +412,7 @@ def update_rich_presence():
 def mod_running_check():
     """Allow mods to check if shell is still running."""
     while True:
-        with open("mods/running.dat", "w") as f:
+        with open("mods/running.dat", "w", encoding="utf-8") as f:
             f.write(str(datetime.datetime.now()))
             f.close()
         sleep(10)
