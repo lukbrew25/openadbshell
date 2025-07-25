@@ -456,15 +456,15 @@ print("--------------------------------------------")
 if os.path.exists("mods") and do_mods:
     mods = []
     for item in os.listdir("mods"):
-        if os.path.isdir(os.path.join("mods/", item)) and item != "rich_presence":
-            files = os.listdir(os.path.join("mods/", item))
+        if os.path.isdir(os.path.join("mods", item)) and item != "rich_presence":
+            files = os.listdir(os.path.join("mods", item))
             for file in files:
                 if file == "mod.exe":
                     mods.append(item)
     if mods:
         for mod in mods:
             print(f"Mod {mod} found, running...")
-            run_and_stream_command(f"mods/{mod}/mod.exe")
+            run_and_stream_command(f"mods\\{mod}\\mod.exe")
     else:
         print("No mods found in the 'mods' directory.")
 elif do_mods:
@@ -472,7 +472,7 @@ elif do_mods:
 else:
     print("Mods are disabled in the configuration.")
 
-run_and_stream_command("mods/rich_presence/mod.exe")
+run_and_stream_command("mods\\rich_presence\\mod.exe")
 
 print("--------------------------------------------")
 print("Loading saved devices...")
