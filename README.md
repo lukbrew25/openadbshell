@@ -74,6 +74,7 @@ openadbshell/
 - OpenADB Shell supports Discord Rich Presence integration.
 - If Discord is running, it will show this app as running in your status and how many devices are connected.
 - You can disable this feature in the configuration window (Enabled by default).
+- You can also permanently remove it by deleting the `rich_presence` folder in the `mods` directory.
 
 ## Mods
 - OpenADB Shell supports mods. Mods are custom executables that are run when the shell starts. Their output is displayed in the shell.
@@ -89,6 +90,12 @@ openadbshell/
       
 ```
 
+## For mod developers
+- Mods function as described above. Refer to the included rich presence mod for an example.
+- There are two data files that may be useful to developers (both are found in the `mods` directory):
+    - `running.dat` - The shell writes the current datetime() to this file every 10 seconds while the shell is running. If the shell stops writing to this file, it means the shell has exited.
+    - `devices.dat` - The shell writes the number of connected devices to this file every 10 seconds while the shell is running.
+
 ## Requirements
 - Windows OS
 - Android SDK Platform Tools (in the `adb` folder)
@@ -97,7 +104,7 @@ openadbshell/
 ## License
 See [LICENSE](LICENSE).
 
-**Not affiliated with Android, Google, Microsoft, or Windows.**
+**Not affiliated with Android, Google, Microsoft, Discord, or Windows.**
 
 ---
 
