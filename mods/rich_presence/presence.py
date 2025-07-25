@@ -9,15 +9,15 @@ def update_vars():
     global enabled_rich_presence, devices
     try:
         while True:
-            with open("enabled.dat", "r") as f:
-                enabled_rich_presence = f.read().strip() == "1"
-                f.close()
-            with open("devices.dat", "r") as f:
-                devices = f.read().strip()
-                f.close()
-            with open("running.dat", "r") as f:
-                running = f.read().strip()
-                f.close()
+            with open("enabled.dat", "r", encoding="utf-8") as datafile:
+                enabled_rich_presence = datafile.read().strip() == "1"
+                datafile.close()
+            with open("devices.dat", "r", encoding="utf-8") as datafile:
+                devices = datafile.read().strip()
+                datafile.close()
+            with open("running.dat", "r", encoding="utf-8") as datafile:
+                running = datafile.read().strip()
+                datafile.close()
                 if running:
                     running_time = datetime.datetime.strptime(running, "%Y-%m-%d %H:%M:%S.%f")
                     current_time = datetime.datetime.now()
