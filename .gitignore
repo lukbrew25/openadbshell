@@ -5,6 +5,7 @@ openadbshell.png
 /dist
 /.idea
 /build
+/mods
 openadbshell.spec
 __pycache__/
 *.pyc

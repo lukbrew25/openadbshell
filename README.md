@@ -70,6 +70,25 @@ openadbshell/
 - The shell saves your custom command preference in `config.dat`.
 - You can change this at any time by running the `config` command.
 
+## Discord Rich Presence
+- OpenADB Shell supports Discord Rich Presence integration.
+- If Discord is running, it will show this app as running in your status and how many devices are connected.
+- You can disable this feature in the configuration window (Enabled by default).
+
+## Mods
+- OpenADB Shell supports mods. Mods are custom executables that are run when the shell starts. Their output is displayed in the shell.
+- All functions of the shell are paused while a mod is running. If the mod is meant to run in the background, I recommend mod.exe simply being the launcher for your mod, which then runs in the background (to avoid blocking the shell).
+- To create a mod, name your executable mod.exe and place it with any dependencies in a unique folder inside the `mods` directory.
+- The shell will automatically detect and run any executables named "mod.exe" in folders inside the `mods` folder.
+Example structure:
+```
+openadbshell/
+  mods/
+    mymodfolder/
+      mod.exe
+      
+```
+
 ## Requirements
 - Windows OS
 - Android SDK Platform Tools (in the `adb` folder)

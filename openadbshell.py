@@ -23,6 +23,7 @@ def save_config():
         with open("config.dat", "w", encoding="utf-8") as config_file:
             config_file.write(f"do_cust_command={do_cust_command}\n")
             config_file.write(f"rich_presence={rich_presence}\n")
+            config_file.write(f"do_mods={do_mods}\n")
             config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
@@ -32,6 +33,7 @@ def load_config():
     """Load configuration from config.dat file."""
     global do_cust_command
     global rich_presence
+    global do_mods
     try:
         if os.path.exists("config.dat"):
             with open("config.dat", "r", encoding="utf-8") as config_file:
@@ -43,12 +45,16 @@ def load_config():
                     if line.startswith("rich_presence="):
                         value = line.split("=", 1)[1]
                         rich_presence = value.lower() == "true"
+                    if line.startswith("do_mods="):
+                        value = line.split("=", 1)[1]
+                        do_mods = value.lower() == "true"
                 config_file.close()
         else:
             # Create config file with default value if it doesn't exist
             with open("config.dat", "w", encoding="utf-8") as config_file:
                 config_file.write("do_cust_command=True\n")
                 config_file.write("rich_presence=True\n")
+                config_file.write("do_mods=False\n")
                 config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
@@ -134,12 +140,15 @@ def open_config_window():  # pylint: disable=too-many-statements
     """Opens a configuration window to manage settings and saved devices."""
     global do_cust_command
     global rich_presence
+    global do_mods
 
     def save_and_close():
         global do_cust_command
         global rich_presence
-        do_cust_command = var.get()
+        global do_mods
+        do_cust_command = cust_command_var.get()
         rich_presence = rich_presence_var.get()
+        do_mods = do_mods_var.get()
         save_config()
 
         # Save devices from the table
@@ -193,14 +202,19 @@ def open_config_window():  # pylint: disable=too-many-statements
     cmd_frame = tk.Frame(config_win)
     cmd_frame.pack(fill=tk.X, padx=10, pady=5)
 
-    var = BooleanVar(value=do_cust_command)
-    chk = tk.Checkbutton(cmd_frame, text="Enable custom command set", variable=var)
+    cust_command_var = BooleanVar(value=do_cust_command)
+    chk = tk.Checkbutton(cmd_frame, text="Enable custom command set", variable=cust_command_var)
     chk.pack(anchor=tk.W)
 
     rich_presence_var = BooleanVar(value=rich_presence)
     rich_presence_chk = tk.Checkbutton(cmd_frame, text="Enable Rich Presence",
                                        variable=rich_presence_var)
     rich_presence_chk.pack(anchor=tk.W)
+
+    do_mods_var = BooleanVar(value=do_mods)
+    do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (experimental)",
+                                 variable=do_mods_var)
+    do_mods_chk.pack(anchor=tk.W)
 
     # Saved devices section
     devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
@@ -415,6 +429,7 @@ try:
         with open("config.dat", "w", encoding="utf-8") as f:
             f.write("do_cust_command=True\n")
             f.write("rich_presence=True\n")
+            f.write("do_mods=False\n")
             f.close()
 except Exception as e:
     print(f"Error creating config file: {e}")
@@ -422,9 +437,8 @@ except Exception as e:
 devices = 0
 do_cust_command = True
 rich_presence = True
+do_mods = False
 load_config()
-doing_rich_presence = Thread(target=do_rich_presence, args=(rich_presence,))
-doing_rich_presence.start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -440,7 +454,31 @@ if not os.path.exists("adb\\adb.exe"):
 run_and_stream_command("adb\\adb.exe version")
 print("--------------------------------------------")
 
-# Auto-connect to saved devices with autoconnect enabled
+if os.path.exists("mods") and do_mods:
+    mods = []
+    for item in os.listdir("mods"):
+        if os.path.isdir(os.path.join("mods/", item)):
+            files = os.listdir(os.path.join("mods/", item))
+            for file in files:
+                if file == "mod.exe":
+                    mods.append(item)
+    if mods:
+        for mod in mods:
+            print(f"Mod {mod} found, running...")
+            run_and_stream_command(f"mods/{mod}/mod.exe")
+    else:
+        print("No mods found in the 'mods' directory.")
+elif do_mods:
+    print("No mods directory found")
+else:
+    print("Mods are disabled in the configuration.")
+
+doing_rich_presence = Thread(target=do_rich_presence, args=(rich_presence,))
+doing_rich_presence.start()
+sleep(1)
+
+print("--------------------------------------------")
+print("Loading saved devices...")
 autoconnect_on_startup()
 print("--------------------------------------------")
 
