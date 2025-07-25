@@ -436,7 +436,9 @@ def count_connected_devices():
     while True:
         global devices
         try:
-            result = subprocess.run(["adb\\adb.exe", "devices"], capture_output=True, text=True, check=False)
+            result = subprocess.run(["adb\\adb.exe", "devices"],
+                                    capture_output=True, text=True,
+                                    check=False)
             lines = result.stdout.strip().split("\n")[1:]
             devices = sum(1 for l in lines if l.strip() and
                           not any(x in l for x in ["offline", "unauthorized"]))
