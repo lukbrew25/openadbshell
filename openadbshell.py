@@ -195,7 +195,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     config_win = tk.Tk()
     config_win.title("OpenADB Config")
-    config_win.geometry("600x500")
+    config_win.geometry("1000x500")
     config_win.resizable(True, True)
 
     # Custom commands section
