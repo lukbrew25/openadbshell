@@ -9,10 +9,12 @@ interacting with ADB (Android Debug Bridge).
 import subprocess
 import sys
 import os
-from time import sleep
+from time import sleep, time
 import tkinter as tk
 from tkinter import BooleanVar, messagebox
 from tkinter import ttk
+from threading import Thread
+from pypresence import Presence
 
 
 def save_config():
@@ -20,6 +22,7 @@ def save_config():
     try:
         with open("config.dat", "w", encoding="utf-8") as config_file:
             config_file.write(f"do_cust_command={do_cust_command}\n")
+            config_file.write(f"rich_presence={rich_presence}\n")
             config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
@@ -28,6 +31,7 @@ def save_config():
 def load_config():
     """Load configuration from config.dat file."""
     global do_cust_command
+    global rich_presence
     try:
         if os.path.exists("config.dat"):
             with open("config.dat", "r", encoding="utf-8") as config_file:
@@ -36,12 +40,15 @@ def load_config():
                     if line.startswith("do_cust_command="):
                         value = line.split("=", 1)[1]
                         do_cust_command = value.lower() == "true"
-                        config_file.close()
-                        break
+                    if line.startswith("rich_presence="):
+                        value = line.split("=", 1)[1]
+                        rich_presence = value.lower() == "true"
+                config_file.close()
         else:
             # Create config file with default value if it doesn't exist
             with open("config.dat", "w", encoding="utf-8") as config_file:
                 config_file.write("do_cust_command=True\n")
+                config_file.write("rich_presence=True\n")
                 config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
@@ -116,10 +123,13 @@ def clear_all_saved_devices():
 def open_config_window():  # pylint: disable=too-many-statements
     """Opens a configuration window to manage settings and saved devices."""
     global do_cust_command
+    global rich_presence
 
     def save_and_close():
         global do_cust_command
+        global rich_presence
         do_cust_command = var.get()
+        rich_presence = rich_presence_var.get()
         save_config()
 
         # Save devices from the table
@@ -169,6 +179,11 @@ def open_config_window():  # pylint: disable=too-many-statements
     var = BooleanVar(value=do_cust_command)
     chk = tk.Checkbutton(cmd_frame, text="Enable custom command set", variable=var)
     chk.pack(anchor=tk.W)
+
+    rich_presence_var = BooleanVar(value=rich_presence)
+    rich_presence_chk = tk.Checkbutton(cmd_frame, text="Enable Rich Presence",
+                                        variable=rich_presence_var)
+    rich_presence_chk.pack(anchor=tk.W)
 
     # Saved devices section
     devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
@@ -281,6 +296,32 @@ def open_config_window():  # pylint: disable=too-many-statements
     config_win.mainloop()
 
 
+def do_rich_presence(enabled_rich_presence):
+    """
+    Initializes and updates the Rich Presence for Discord.
+    """
+    global devices
+    try:
+        while True:
+            if enabled_rich_presence:
+                client_id = "REDACTED"  # Replace with your actual Discord client ID
+                RPC = Presence(client_id)
+                RPC.connect()
+                start = int(time())
+                RPC.update(state="Connected to 0 devices in OpenADB Shell! Download here: "
+                                                                "https://github.com/lukbrew25/openadbshell",
+                           start=start)
+                sleep(15)
+                while True:
+                    RPC.update(state="Connected to " + str(devices) + " device(s) in OpenADB Shell! Download here: "
+                                                                    "https://github.com/lukbrew25/openadbshell",
+                               start=start)
+                    sleep(15)
+            sleep(30)
+    except Exception as e:
+        print(f"Error in Rich Presence: {e}")
+
+
 def run_and_stream_command(command):
     """
     Executes a given command and streams its stdout and stderr to the console.
@@ -289,6 +330,7 @@ def run_and_stream_command(command):
         command (str): The command string to execute.
     """
     try:
+        success = True
         process = subprocess.Popen(
             command,
             shell=True,
@@ -300,26 +342,36 @@ def run_and_stream_command(command):
 
         for line in iter(process.stdout.readline, ''):
             print(line, end='')
+            if "cannot" in line.lower():
+                success = False
 
         for line in iter(process.stderr.readline, ''):
             print(f"Error: {line}", end='')
+            if "cannot" in line.lower():
+                success = False
 
         process.wait()
+        return success
     except Exception as e:
         print(f"An error occurred: {e}")
+        return False
 
 
 try:
     if not os.path.exists("config.dat"):
         with open("config.dat", "w", encoding="utf-8") as f:
             f.write("do_cust_command=True\n")
+            f.write("rich_presence=True\n")
             f.close()
 except Exception as e:
     print(f"Error creating config file: {e}")
 
+devices = 0
 do_cust_command = True
+rich_presence = True
 load_config()
-print("Welcome to the OpenADB Shell! (v1.0.4)")
+doing_rich_presence = Thread(target=do_rich_presence, args=(rich_presence,))
+doing_rich_presence.start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -344,6 +396,7 @@ while True:
                            "exiting? (y/n): ")
         if disconnect.lower().startswith('y'):
             run_and_stream_command("adb\\adb.exe disconnect")
+            devices = 0
         print("Exiting adb shell.")
         sys.exit(0)
     elif do_cust_command and user_command.lower() == "clear":
@@ -387,7 +440,8 @@ while True:
                 print("Error: Please provide a valid port number.")
                 continue
         run_command = "adb\\adb.exe connect localhost:" + str(port)
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices +=1
     elif do_cust_command and user_command.lower().startswith("localdisconnect "):
         port = user_command[16:].strip()
         if not port.isdigit():
@@ -397,19 +451,30 @@ while True:
                 print("Error: Please provide a valid port number.")
                 continue
         run_command = "adb\\adb.exe disconnect localhost:" + str(port)
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices -= 1
+            if devices < 0:
+                devices = 0
     elif do_cust_command and user_command.lower() == "wsaconnect":
         run_command = "adb\\adb.exe connect localhost:58526"
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices += 1
     elif do_cust_command and user_command.lower() == "wsadisconnect":
         run_command = "adb\\adb.exe disconnect localhost:58526"
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices -= 1
+            if devices < 0:
+                devices = 0
     elif do_cust_command and user_command.lower() == "connect wsa":
         run_command = "adb\\adb.exe connect localhost:58526"
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices += 1
     elif do_cust_command and user_command.lower() == "disconnect wsa":
         run_command = "adb\\adb.exe disconnect localhost:58526"
-        run_and_stream_command(run_command)
+        if run_and_stream_command(run_command):
+            devices -= 1
+            if devices < 0:
+                devices = 0
     elif do_cust_command and user_command.lower().startswith("save "):
         parts = user_command[5:].strip().split("--name")
         if len(parts) != 2:
@@ -482,6 +547,28 @@ while True:
     elif do_cust_command and user_command.lower().startswith("shpm "):
         run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
+    elif (user_command.startswith("connect ") or user_command.startswith("adb connect ")
+          or user_command.startswith("adb.exe connect ")):
+        if user_command.startswith("connect "):
+            run_command = "adb\\adb.exe connect " + user_command[8:]
+        elif user_command.startswith("adb connect "):
+            run_command = "adb\\adb.exe connect " + user_command[12:]
+        else:
+            run_command = "adb\\adb.exe connect " + user_command[16:]
+        if run_and_stream_command(run_command):
+            devices += 1
+    elif (user_command.startswith("disconnect ") or user_command.startswith("adb disconnect ")
+          or user_command.startswith("adb.exe disconnect ")):
+        if user_command.startswith("disconnect "):
+            run_command = "adb\\adb.exe disconnect " + user_command[11:]
+        elif user_command.startswith("adb disconnect "):
+            run_command = "adb\\adb.exe disconnect " + user_command[15:]
+        else:
+            run_command = "adb\\adb.exe disconnect " + user_command[19:]
+        if run_and_stream_command(run_command):
+            devices -= 1
+            if devices < 0:
+                devices = 0
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
         run_and_stream_command(run_command)

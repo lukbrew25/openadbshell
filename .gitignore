@@ -9,4 +9,5 @@ openadbshell.spec
 __pycache__/
 *.pyc
 *.pyo
+.env
 config.dat
