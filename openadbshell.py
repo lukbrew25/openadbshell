@@ -396,18 +396,13 @@ def run_and_stream_command(command):
 
 
 def update_rich_presence():
-    """Update Discord Rich Presence with the current device count."""
-    global devices, rich_presence
+    """Update Discord Rich Presence with the enabled status."""
+    global rich_presence, rich_presence_exists
     while True:
-        with open("mods/rich_presence/enabled.dat", "w", encoding="utf-8") as f:
-            f.write("1" if rich_presence else "0")
-            f.close()
-        with open("mods/rich_presence/running.dat", "w", encoding="utf-8") as f:
-            f.write(str(datetime.datetime.now()))
-            f.close()
-        with open("mods/rich_presence/devices.dat", "w", encoding="utf-8") as f:
-            f.write(str(devices))
-            f.close()
+        if rich_presence_exists:
+            with open("mods/rich_presence/enabled.dat", "w", encoding="utf-8") as f:
+                f.write("1" if rich_presence else "0")
+                f.close()
         sleep(10)
 
 
@@ -445,8 +440,20 @@ def count_connected_devices():
         except Exception as e:
             print(f"Error counting devices: {e}")
             devices = 0
+        with open("mods/devices.dat", "w", encoding="utf-8") as f:
+            f.write(str(devices))
+            f.close()
         sleep(10)
 
+
+if (os.path.exists(os.path.join("mods", "rich_presence", "mod.exe")) and
+        os.path.exists(os.path.join("mods", "rich_presence", "presence.exe"))):
+    rich_presence_exists = True
+else:
+    rich_presence_exists = False
+    print("Rich Presence mod not found, disabling all Rich Presence functionality.")
+
+print("---------------------------------------------")
 
 devices = 0  # Number of connected devices
 stop_device_counter = Event()
@@ -457,7 +464,8 @@ do_cust_command = True
 rich_presence = True
 do_mods = False
 load_config()
-Thread(target=update_rich_presence, daemon=True).start()
+if rich_presence_exists:
+    Thread(target=update_rich_presence, daemon=True).start()
 Thread(target=mod_running_check, daemon=True).start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
@@ -493,7 +501,8 @@ elif do_mods:
 else:
     print("Mods are disabled in the configuration.")
 
-run_and_stream_command("mods\\rich_presence\\mod.exe")
+if rich_presence_exists:
+    run_and_stream_command("mods\\rich_presence\\mod.exe")
 
 print("--------------------------------------------")
 print("Loading saved devices...")
