@@ -63,7 +63,6 @@ def load_saved_devices():
                 for line in config_file:
                     line = line.strip()
                     if line.startswith("saved_device="):
-                        # Format: saved_device=name/!/ip:port or saved_device=name/!/ip:port/!/autoconnect
                         device_data = line.split("=", 1)[1]
                         if "/!/" in device_data:
                             parts = device_data.split("/!/")
@@ -233,7 +232,9 @@ def open_config_window():  # pylint: disable=too-many-statements
     saved_devices = load_saved_devices()
     for device in saved_devices:
         autoconnect_display = "Y" if device.get('autoconnect', False) else "N"
-        device_tree.insert('', 'end', values=(device['name'], device['ip_port'], autoconnect_display))
+        device_tree.insert('', 'end', values=(device['name'],
+                                              device['ip_port'],
+                                              autoconnect_display))
 
     # Device management buttons
     device_btn_frame = tk.Frame(devices_frame)
@@ -317,8 +318,10 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     # Instructions
     instructions = tk.Label(config_win,
-                            text="Double-click cells to edit. Click Autoconnect column to toggle Y/N. "
-                                 "Use 'Save' to apply table changes, 'Clear All' takes "
+                            text="Double-click cells to edit. "
+                                 "Click Autoconnect column to toggle Y/N. "
+                                 "Use 'Save' to apply table changes, "
+                                 "'Clear All' takes "
                                  "immediate effect.",
                             font=('Arial', 8), fg='gray')
     instructions.pack(side=tk.BOTTOM, pady=5)
@@ -356,13 +359,15 @@ def do_rich_presence(enabled_rich_presence):
                 RPC = Presence(client_id)
                 RPC.connect()
                 start = int(time())
-                RPC.update(state="Connected to 0 devices in OpenADB Shell! Download here: "
-                                                                "https://github.com/lukbrew25/openadbshell",
+                RPC.update(state="Connected to 0 devices in "
+                                 "OpenADB Shell! Download here: "
+                                 "https://github.com/lukbrew25/openadbshell",
                            start=start)
                 sleep(15)
                 while True:
-                    RPC.update(state="Connected to " + str(devices) + " device(s) in OpenADB Shell! Download here: "
-                                                                    "https://github.com/lukbrew25/openadbshell",
+                    RPC.update(state="Connected to " + str(devices) +
+                                     " device(s) in OpenADB Shell! Download here: "
+                                     "https://github.com/lukbrew25/openadbshell",
                                start=start)
                     sleep(15)
             sleep(30)
@@ -508,8 +513,7 @@ while True:
         run_command = "adb\\adb.exe disconnect localhost:" + str(port)
         if run_and_stream_command(run_command):
             devices -= 1
-            if devices < 0:
-                devices = 0
+            devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "wsaconnect":
         run_command = "adb\\adb.exe connect localhost:58526"
         if run_and_stream_command(run_command):
@@ -518,8 +522,7 @@ while True:
         run_command = "adb\\adb.exe disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
-            if devices < 0:
-                devices = 0
+            devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "connect wsa":
         run_command = "adb\\adb.exe connect localhost:58526"
         if run_and_stream_command(run_command):
@@ -528,8 +531,7 @@ while True:
         run_command = "adb\\adb.exe disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
-            if devices < 0:
-                devices = 0
+            devices = max(devices, 0)
     elif do_cust_command and user_command.lower().startswith("save "):
         parts = user_command[5:].strip().split("--name")
         if len(parts) != 2:
@@ -622,8 +624,7 @@ while True:
             run_command = "adb\\adb.exe disconnect " + user_command[19:]
         if run_and_stream_command(run_command):
             devices -= 1
-            if devices < 0:
-                devices = 0
+            devices = max(devices, 0)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
         run_and_stream_command(run_command)
