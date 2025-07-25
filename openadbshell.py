@@ -14,8 +14,7 @@ import tkinter as tk
 from tkinter import BooleanVar, messagebox
 from tkinter import ttk
 from threading import Thread
-from pypresence import Presence
-
+import datetime
 
 def save_config():
     """Save configuration to config.dat file."""
@@ -361,34 +360,6 @@ def autoconnect_on_startup():
         print(f"Error during autoconnect: {e}")
 
 
-def do_rich_presence(enabled_rich_presence):
-    """
-    Initializes and updates the Rich Presence for Discord.
-    """
-    global devices
-    try:
-        while True:
-            if enabled_rich_presence:
-                client_id = "REDACTED"  # Replace with your actual Discord client ID
-                RPC = Presence(client_id)
-                RPC.connect()
-                start = int(time())
-                RPC.update(state="Connected to 0 devices in "
-                                 "OpenADB Shell! Download here: "
-                                 "https://github.com/lukbrew25/openadbshell",
-                           start=start)
-                sleep(15)
-                while True:
-                    RPC.update(state="Connected to " + str(devices) +
-                                     " device(s) in OpenADB Shell! Download here: "
-                                     "https://github.com/lukbrew25/openadbshell",
-                               start=start)
-                    sleep(15)
-            sleep(30)
-    except Exception as e:
-        print(f"Error in Rich Presence: {e}")
-
-
 def run_and_stream_command(command):
     """
     Executes a given command and streams its stdout and stderr to the console.
@@ -423,6 +394,20 @@ def run_and_stream_command(command):
         print(f"An error occurred: {e}")
         return False
 
+def update_rich_presence():
+    """Update Discord Rich Presence with the current device count."""
+    global devices, rich_presence
+    while True:
+        with open("mods/rich_presence/enabled.dat", "w") as f:
+            f.write("1" if rich_presence else "0")
+            f.close()
+        with open("mods/rich_presence/running.dat", "w") as f:
+            f.write(str(datetime.datetime.now()))
+            f.close()
+        with open("mods/rich_presence/devices.dat", "w") as f:
+            f.write(str(devices))
+            f.close()
+        sleep(10)
 
 try:
     if not os.path.exists("config.dat"):
@@ -439,6 +424,7 @@ do_cust_command = True
 rich_presence = True
 do_mods = False
 load_config()
+Thread(target=update_rich_presence).start()
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -457,7 +443,7 @@ print("--------------------------------------------")
 if os.path.exists("mods") and do_mods:
     mods = []
     for item in os.listdir("mods"):
-        if os.path.isdir(os.path.join("mods/", item)):
+        if os.path.isdir(os.path.join("mods/", item)) and item != "rich_presence":
             files = os.listdir(os.path.join("mods/", item))
             for file in files:
                 if file == "mod.exe":
@@ -473,9 +459,7 @@ elif do_mods:
 else:
     print("Mods are disabled in the configuration.")
 
-doing_rich_presence = Thread(target=do_rich_presence, args=(rich_presence,))
-doing_rich_presence.start()
-sleep(1)
+run_and_stream_command("mods/rich_presence/mod.exe")
 
 print("--------------------------------------------")
 print("Loading saved devices...")

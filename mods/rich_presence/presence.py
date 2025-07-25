@@ -1,0 +1,68 @@
+from pypresence import Presence
+from time import time, sleep
+import os
+from threading import Thread
+import datetime
+
+
+def update_vars():
+    global enabled_rich_presence, devices
+    try:
+        while True:
+            with open("enabled.dat", "r") as f:
+                enabled_rich_presence = f.read().strip() == "1"
+                f.close()
+            with open("devices.dat", "r") as f:
+                devices = f.read().strip()
+                f.close()
+            with open("running.dat", "r") as f:
+                running = f.read().strip()
+                f.close()
+                if running:
+                    running_time = datetime.datetime.strptime(running, "%Y-%m-%d %H:%M:%S.%f")
+                    current_time = datetime.datetime.now()
+                    if (current_time - running_time).total_seconds() > 30:
+                        exit(0)
+            sleep(15)
+    except Exception as e:
+        print(f"Error reading files: {e}")
+
+try:
+    if not os.path.exists("enabled.dat"):
+        with open("enabled.dat", "w") as f:
+            f.write("1")
+            f.close()
+    if not os.path.exists("devices.dat"):
+        with open("devices.dat", "w") as f:
+            f.write("0")
+            f.close()
+    with open("enabled.dat", "r") as f:
+        enabled_rich_presence = f.read().strip() == "1"
+        f.close()
+    with open("devices.dat", "r") as f:
+        devices = f.read().strip()
+        f.close()
+    Thread(target=update_vars, daemon=True).start()
+    start = int(time())
+    while True:
+        if enabled_rich_presence:
+            client_id = "REDACTED"  # Replace with your actual Discord client ID
+            RPC = Presence(client_id)
+            RPC.connect()
+            RPC.update(state="Connected to " + str(devices) + " devices in "
+                             "OpenADB Shell! Download here: "
+                             "https://github.com/lukbrew25/openadbshell",
+                       start=start)
+            sleep(15)
+            while True:
+                if not enabled_rich_presence:
+                    RPC.close()
+                    break
+                RPC.update(state="Connected to " + str(devices) +
+                                 " device(s) in OpenADB Shell! Download here: "
+                                 "https://github.com/lukbrew25/openadbshell",
+                           start=start)
+                sleep(15)
+        sleep(30)
+except Exception as e:
+    print(f"Error in Rich Presence: {e}")

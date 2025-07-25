@@ -5,10 +5,12 @@ openadbshell.png
 /dist
 /.idea
 /build
-/mods
 openadbshell.spec
 __pycache__/
 *.pyc
 *.pyo
-.env
+mods/rich_presence/.env
+mods/rich_presence/devices.dat
+mods/rich_presence/running.dat
+mods/rich_presence/enabled.dat
 config.dat
