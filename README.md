@@ -1,4 +1,4 @@
-# OpenADB Shell
+# OpenADB Shell (v2 Release!)
 
 OpenADB Shell is a simple, open source command-line interface for interacting with ADB (Android Debug Bridge) on Windows. It provides a user-friendly shell with custom commands, configuration options, and direct access to standard ADB commands.
 
@@ -20,7 +20,7 @@ OpenADB Shell is a simple, open source command-line interface for interacting wi
 5. Unzip the platform tools and move all files directly into the `adb` folder (so you have `adb/adb.exe`, etc.).
 6. Run `openadbshell.exe` to start the shell.
 
-Your directory structure should look like (ignoring the internal files):
+Your directory structure should look like this:
 
 ```
 openadbshell/
@@ -28,6 +28,18 @@ openadbshell/
   adb/
     adb.exe
     ...other platform tools files...
+  mods/
+    running.dat (created after first run)
+    devices.dat (created after first run)
+    rich_presence/
+      mod.exe
+      presence.exe
+      enabled.dat (created after first run)
+  config.dat (created after first run)
+  README.md
+  LICENSE
+  _internal/
+    ...internal files...
 ```
 
 ## Adding to Windows Terminal
