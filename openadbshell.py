@@ -535,13 +535,19 @@ while True:
         print("You can also contribute to the project by submitting issues or pull requests.")
         print("Thank you for using OpenADB Shell!")
         print("--------------------------------------------")
-        print("Credits: lukbrew25 for the project, all future contributors, the Python developers and community, "
+        print("Credits: lukbrew25 for the project, all future contributors, "
+              "the Python developers and community, "
               "pypresence for Rich Presence support, and pyinstaller for packaging.")
-        print("Disclaimer: This software is provided 'as is', without warranty of any kind, express or implied.")
-        print("Use at your own risk. The developer is not responsible for any damage or data loss.")
-        print("This project and lukbrew25 are not affiliated with or sponsored by Google, Android, ADB, "
-              "Windows, Microsoft, Discord, the Python foundation, the pypresence and pyinstaller projects, "
-              "or any other third-party software, entity, organization, or company.")
+        print("Disclaimer: This software is provided 'as is', without warranty of any "
+              "kind, express or implied.")
+        print("Use at your own risk. The developer is not responsible "
+              "for any damage or data loss.")
+        print("This project and lukbrew25 are not affiliated with or "
+              "sponsored by Google, Android, ADB, "
+              "Windows, Microsoft, Discord, the Python foundation, "
+              "the pypresence and pyinstaller projects, "
+              "or any other third-party software, entity, "
+              "organization, or company.")
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
         print("  config - Open the configuration window to enable/disable "
