@@ -467,6 +467,7 @@ load_config()
 if rich_presence_exists:
     Thread(target=update_rich_presence, daemon=True).start()
 Thread(target=mod_running_check, daemon=True).start()
+print("Welcome to OpenADB Shell! (v2)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
