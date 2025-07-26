@@ -11,10 +11,18 @@ OpenADB Shell is a simple, open source command-line interface for interacting wi
 - Persistent configuration saved to `config.dat`
 - Error handling for missing ADB tools
 - Open source and easy to extend
+- Discord Rich Presence support (optional)
+- Mod support for custom functionality (e.g., rich presence)
+- Portable - run from any non-protected directory without installation
+- Windows Terminal integration guide
+- Autoconnect to chosen devices on shell start
+- Custom device management (save, connect, disconnect, remove)
+- WSA (Windows Subsystem for Android) support for ADB connections
+- Local ADB server connection support
 
 ## Installation
 1. Download the latest release zip from [GitHub Releases](https://github.com/lukbrew25/openadbshell/releases).
-2. Unzip the file into a folder (e.g., your Documents folder).
+2. Unzip the file into a folder (e.g., your Documents folder). Note: This app is fully portable and can bbe run from any non-protected directory.
 3. Download the latest Android SDK Platform Tools for Windows: [Platform Tools Download](https://developer.android.com/tools/releases/platform-tools)
 4. In your `openadbshell` directory, create a folder named `adb`.
 5. Unzip the platform tools and move all files directly into the `adb` folder (so you have `adb/adb.exe`, etc.).
