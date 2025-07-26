@@ -35,6 +35,8 @@ openadbshell/
       mod.exe
       presence.exe
       enabled.dat (created after first run)
+      _internal/
+        ...internal files...
   config.dat (created after first run)
   README.md
   LICENSE
