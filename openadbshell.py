@@ -524,6 +524,16 @@ while True:
         sys.exit(0)
     elif do_cust_command and user_command.lower() == "clear":
         os.system('cls')
+    elif do_cust_command and user_command.lower() == "about":
+        print("OpenADB Shell is a simple command-line interface for interacting with ADB (Android "
+              "Debug Bridge) on Windows only.")
+        print("Version: 2.0.0")
+        print("Created by lukbrew25")
+        print("GitHub: https://github.com/lukbrew25/openadbshell")
+        print("This software is fully open source and available on GitHub.")
+        print("For more information, please refer to the README.md file.")
+        print("You can also contribute to the project by submitting issues or pull requests.")
+        print("Thank you for using OpenADB Shell!")
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
         print("  config - Open the configuration window to enable/disable "
@@ -545,6 +555,7 @@ while True:
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
         print("  shpm <command> - Execute a shell pm command on the device.")
         print("  <adb command> - Execute an adb command")
+        print("  about - Show information about OpenADB Shell")
         print("")
         print("Note: Devices with autoconnect enabled will automatically connect on startup.")
     elif do_cust_command and user_command.lower() == "installedapps":

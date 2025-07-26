@@ -65,6 +65,7 @@ openadbshell/
 | disconnect wsa               | Alias for wsadisconnect                            |
 | shpm <command>               | Execute a shell pm command on the device           |
 | adb <args>                   | Run any ADB command (with or without the prefix)   |
+| about                        | Show information about OpenADB Shell               |
 
 ## Configuration
 - The shell saves your custom command preference in `config.dat`.
