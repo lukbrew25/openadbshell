@@ -93,6 +93,7 @@ openadbshell/
 
 ## For mod developers
 - Mods function as described above. Refer to the included rich presence mod for an example.
+- Note: The working directory for all mods is the directory of the shell executable (i.e., where `openadbshell.exe` is located).
 - There are two data files that may be useful to developers (both are found in the `mods` directory):
     - `running.dat` - The shell writes the current datetime() to this file every 10 seconds while the shell is running. If the shell stops writing to this file, it means the shell has exited.
     - `devices.dat` - The shell writes the number of connected devices to this file every 10 seconds while the shell is running.
