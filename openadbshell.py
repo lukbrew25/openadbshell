@@ -571,6 +571,11 @@ while True:
         print("  wsadisconnect - Disconnect from local default WSA adb port (58526).")
         print("  shpm <command> - Execute a shell pm command on the device.")
         print("  <adb command> - Execute an adb command")
+        print("  cmd <command> - Execute a command in command prompt")
+        print("  cmd.exe <command> - Execute a command in command prompt")
+        print("  powershell <command> - Execute a command in PowerShell")
+        print("  powershell.exe <command> - Execute a command in PowerShell")
+        print("  pwrsh <command> - Execute a command in PowerShell")
         print("  about - Show information about OpenADB Shell")
         print("")
         print("Note: Devices with autoconnect enabled will automatically connect on startup.")
@@ -720,6 +725,21 @@ while True:
         run_and_stream_command(run_command)
     elif user_command.startswith("adb.exe "):
         run_command = "adb\\adb.exe " + user_command[8:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("cmd "):
+        run_command = "cmd.exe /c " + user_command[4:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("cmd.exe "):
+        run_command = "cmd.exe /c " + user_command[8:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("powershell "):
+        run_command = "powershell.exe -Command " + user_command[11:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("powershell.exe "):
+        run_command = "powershell.exe -Command " + user_command[15:]
+        run_and_stream_command(run_command)
+    elif user_command.startswith("pwrsh "):
+        run_command = "powershell.exe -Command " + user_command[5:]
         run_and_stream_command(run_command)
     else:
         run_command = "adb\\adb.exe " + user_command
