@@ -524,6 +524,15 @@ while True:
         sys.exit(0)
     elif do_cust_command and user_command.lower() == "clear":
         os.system('cls')
+    elif do_cust_command and user_command.lower() == "cls":
+        os.system('cls')
+    elif do_cust_command and user_command.startswith("setworkingdir "):
+        new_dir = user_command[14:].strip()
+        if os.path.isdir(new_dir):
+            os.chdir(new_dir)
+            print(f"Working directory changed to: {os.getcwd()}")
+        else:
+            print(f"Error: '{new_dir}' is not a valid directory.")
     elif do_cust_command and user_command.lower() == "about":
         print("OpenADB Shell is a simple command-line interface for interacting with ADB (Android "
               "Debug Bridge) on Windows only.")

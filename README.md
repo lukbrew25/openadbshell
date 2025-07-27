@@ -72,6 +72,8 @@ openadbshell/
 | config                       | Open the configuration window                      |
 | exit                         | Exit the shell (optionally disconnect all devices) |
 | clear                        | Clear the console                                  |
+| clr                          | Alias for clear                                    |
+| setworkingdir >dir>          | Change the current working directory.              |
 | help                         | Show this help message                             |
 | save <ip:port> --name <name> | Save the current ADB connection to a callable name |
 | connectsaved <name>          | Load a saved ADB connection by name                |
