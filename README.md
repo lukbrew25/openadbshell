@@ -48,6 +48,8 @@ openadbshell/
   config.dat (created after first run)
   README.md
   LICENSE
+    apks/ (optional, for installing multi-part apps)
+        ...apk files...
   _internal/
     ...internal files...
 ```
@@ -75,6 +77,7 @@ openadbshell/
 | clr                          | Alias for clear                                                            |
 | help                         | Show this help message                                                     |
 | save [ip:port] --name [name] | Save the current ADB connection to a callable name                         |
+| setworkingdir [path]         | Set the working directory for this session                                 |
 | connectsaved [name]          | Load a saved ADB connection by name                                        |
 | disconnectsaved [name]       | Disconnect a saved ADB connection by name                                  |
 | removesaved [name]           | Remove a saved connection by name                                          |
@@ -97,8 +100,15 @@ openadbshell/
 | about                        | Show information about OpenADB Shell                                       |
 
 ## Configuration
-- The shell saves your custom command preference in `config.dat`.
-- You can change this at any time by running the `config` command.
+- The shell saves your custom preferences in `config.dat`.
+- You can change your preferences at any time by running the `config` command.
+- The configuration window allows you to:
+  - Enable/disable custom commands. (All shell-specific commands except `config` will be disabled if custom commands are disabled. You will only be able to run built-in adb commands.)
+  - Manage saved devices (add, connect, disconnect, remove)
+  - Enable/disable Discord Rich Presence integration
+  - Set the working directory for the shell (default is the directory where `openadbshell.exe` is located)
+  - Enable/disable autoconnect to saved devices on shell start
+  - Enable/disable mod support (mods are custom executables that run when the shell starts). Does not affect rich presence mod (which is controlled separately).
 
 ## Discord Rich Presence
 - OpenADB Shell supports Discord Rich Presence integration.

@@ -87,6 +87,7 @@ def load_config():
                 config_file.write("do_cust_command=True\n")
                 config_file.write("rich_presence=True\n")
                 config_file.write("do_mods=False\n")
+                config_file.write("default_working_dir=\n")
                 config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
@@ -521,6 +522,7 @@ def count_connected_devices():
 if (os.path.exists(RICH_PRESENCE_MOD) and
         os.path.exists(RICH_PRESENCE_EXE)):
     rich_presence_exists = True
+    print("Rich Presence mod found")
 else:
     rich_presence_exists = False
     print("Rich Presence mod not found, disabling all Rich Presence functionality.")
@@ -581,7 +583,20 @@ if rich_presence_exists:
 print("--------------------------------------------")
 print("Loading saved devices...")
 autoconnect_on_startup()
+run_and_stream_command(f"{ADB_EXECUTABLE} devices")
 print("--------------------------------------------")
+
+if default_working_dir:
+    if os.path.exists(default_working_dir):
+        os.chdir(default_working_dir)
+        print(f"Default working directory set to: {default_working_dir}")
+    else:
+        print(f"Default working directory '{default_working_dir}' does not exist, "
+              "using current directory instead.")
+else:
+    print("Default working directory not set, using current directory.")
+
+print("---------------------------------------------")
 
 while True:
     user_command = str(input("openadbshell:"))
@@ -638,6 +653,7 @@ while True:
         print("  installedapps - List installed apps on connected devices")
         print("  installapp - Install all apks (must belong to same app) "
               "in the 'apks' folder to all connected devices")
+        print("  setworkingdir <path> - Set the working directory")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
         print("  localdisconnect <port> - Disconnect from "
@@ -657,6 +673,16 @@ while True:
     elif do_cust_command and user_command.lower() == "installedapps":
         run_command = f"{ADB_EXECUTABLE} shell pm list packages"
         run_and_stream_command(run_command)
+    elif do_cust_command and user_command.lower().startswith("setworkingdir "):
+        new_dir = user_command[14:].strip()
+        if not new_dir:
+            print("Error: Please provide a valid directory path.")
+            continue
+        if not os.path.isdir(new_dir):
+            print(f"Error: The directory '{new_dir}' does not exist.")
+            continue
+        os.chdir(new_dir)
+        print(f"Working directory set to: {os.getcwd()}")
     elif do_cust_command and user_command.startswith("apppath "):
         package_name = user_command[8:].strip()
         if not package_name:
