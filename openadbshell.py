@@ -183,7 +183,8 @@ def open_config_window():  # pylint: disable=too-many-statements
         do_cust_command = cust_command_var.get()
         rich_presence = rich_presence_var.get()
         do_mods = do_mods_var.get()
-        default_working_dir = working_dir_var.get() if working_dir_var.get().strip() else None
+        working_dir_value = working_dir_var.get()
+        default_working_dir = working_dir_value if working_dir_value.strip() else None
         save_config()
 
         # Save devices from the table
