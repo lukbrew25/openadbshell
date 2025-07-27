@@ -67,33 +67,34 @@ openadbshell/
 - If custom commands are disabled, only standard ADB commands will work (except `config`).
 
 ## Available Shell-Specific Commands (run help for more info)
-| Command                      | Description                                        |
-|------------------------------|----------------------------------------------------|
-| config                       | Open the configuration window                      |
-| exit                         | Exit the shell (optionally disconnect all devices) |
-| clear                        | Clear the console                                  |
-| clr                          | Alias for clear                                    |
-| help                         | Show this help message                             |
-| save [ip:port] --name [name] | Save the current ADB connection to a callable name |
-| connectsaved [name]          | Load a saved ADB connection by name                |
-| disconnectsaved [name]       | Disconnect a saved ADB connection by name          |
-| removesaved [name]           | Remove a saved connection by name                  |
-| installedapps                | List installed apps on connected devices           |
-| apppath [package]            | Show the path to the APK file for a package        |
-| localconnect [port]          | Connect to a local ADB server by port              |
-| localdisconnect [port]       | Disconnect from a local ADB server by port         |
-| wsaconnect                   | Connect to the default WSA ADB port (58526)        |
-| wsadisconnect                | Disconnect from the default WSA ADB port (58526)   |
-| connect wsa                  | Alias for wsaconnect                               |
-| disconnect wsa               | Alias for wsadisconnect                            |
-| shpm [command]               | Execute a shell pm command on the device           |
-| adb [command]                | Run any ADB command (with or without the prefix)   |
-| cmd [command]                | Run any command in command prompt.                 |
-| cmd.exe [command]            | Alias for cmd                                      |
-| powershell [command]         | Run any command in PowerShell                      |
-| powershell.exe [command]     | Alias for powershell                               |
-| pwrsh [command]              | Alias for powershell                               |
-| about                        | Show information about OpenADB Shell               |
+| Command                      | Description                                                                |
+|------------------------------|----------------------------------------------------------------------------|
+| config                       | Open the configuration window                                              |
+| exit                         | Exit the shell (optionally disconnect all devices)                         |
+| clear                        | Clear the console                                                          |
+| clr                          | Alias for clear                                                            |
+| help                         | Show this help message                                                     |
+| save [ip:port] --name [name] | Save the current ADB connection to a callable name                         |
+| connectsaved [name]          | Load a saved ADB connection by name                                        |
+| disconnectsaved [name]       | Disconnect a saved ADB connection by name                                  |
+| removesaved [name]           | Remove a saved connection by name                                          |
+| installedapps                | List installed apps on connected devices                                   |
+| installapp                   | Install all apks (must belong to same app) in `apks` folder to all devices |
+| apppath [package]            | Show the path to the APK file for a package                                |
+| localconnect [port]          | Connect to a local ADB server by port                                      |
+| localdisconnect [port]       | Disconnect from a local ADB server by port                                 |
+| wsaconnect                   | Connect to the default WSA ADB port (58526)                                |
+| wsadisconnect                | Disconnect from the default WSA ADB port (58526)                           |
+| connect wsa                  | Alias for wsaconnect                                                       |
+| disconnect wsa               | Alias for wsadisconnect                                                    |
+| shpm [command]               | Execute a shell pm command on the device                                   |
+| adb [command]                | Run any ADB command (with or without the prefix)                           |
+| cmd [command]                | Run any command in command prompt                                          |
+| cmd.exe [command]            | Alias for cmd                                                              |
+| powershell [command]         | Run any command in PowerShell                                              |
+| powershell.exe [command]     | Alias for powershell                                                       |
+| pwrsh [command]              | Alias for powershell                                                       |
+| about                        | Show information about OpenADB Shell                                       |
 
 ## Configuration
 - The shell saves your custom command preference in `config.dat`.

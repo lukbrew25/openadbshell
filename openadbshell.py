@@ -563,6 +563,7 @@ while True:
         print("  connectsaved <name> - Connect to a saved device by name")
         print("  disconnectsaved <name> - Disconnect from a saved device by name")
         print("  installedapps - List installed apps on connected devices")
+        print("  installapp - Install all apks (must belong to same app) in the 'apks' folder to all connected devices")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
         print("  localdisconnect <port> - Disconnect from "
@@ -741,6 +742,18 @@ while True:
     elif user_command.startswith("pwrsh "):
         run_command = "powershell.exe -Command " + user_command[5:]
         run_and_stream_command(run_command)
+    elif do_cust_command and user_command.lower() == "installapp":
+        if not os.path.exists("apks"):
+            print("Error: 'apks' directory not found. Please create an 'apks' directory "
+                  "and place your APK files there.")
+        else:
+            apk_files = [f for f in os.listdir("apks") if f.endswith('.apk')]
+            if not apk_files:
+                print("No APK files found in the 'apks' directory.")
+            else:
+                run_command = "adb\\adb.exe install-multiple -r " + " ".join(
+                    [os.path.join("apks", apk) for apk in apk_files])
+                run_and_stream_command(run_command)
     else:
         run_command = "adb\\adb.exe " + user_command
         run_and_stream_command(run_command)
