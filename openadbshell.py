@@ -529,7 +529,7 @@ while True:
     elif do_cust_command and user_command.lower() == "about":
         print("OpenADB Shell is a simple command-line interface for interacting with ADB (Android "
               "Debug Bridge) on Windows only.")
-        print("Version: 2.0.0")
+        print("Version: 2.1.0")
         print("Created by lukbrew25")
         print("GitHub: https://github.com/lukbrew25/openadbshell")
         print("This software is fully open source and available on GitHub.")
