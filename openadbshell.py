@@ -267,14 +267,16 @@ def open_config_window():  # pylint: disable=too-many-statements
     working_dir_entry_frame.pack(fill=tk.X, pady=2)
 
     working_dir_var = tk.StringVar(value=default_working_dir if default_working_dir else "")
-    working_dir_entry = tk.Entry(working_dir_entry_frame, textvariable=working_dir_var, state='readonly')
+    working_dir_entry = tk.Entry(working_dir_entry_frame,
+                                 textvariable=working_dir_var, state='readonly')
     working_dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
 
     def browse_working_directory():
         """Browse for a working directory."""
         directory = filedialog.askdirectory(
             title="Select Default Working Directory",
-            initialdir=default_working_dir if default_working_dir and os.path.exists(default_working_dir) else os.getcwd()
+            initialdir=default_working_dir if default_working_dir and os.path.exists(
+                default_working_dir) else os.getcwd()
         )
         if directory:
             working_dir_var.set(directory)
@@ -283,10 +285,12 @@ def open_config_window():  # pylint: disable=too-many-statements
         """Clear the working directory setting."""
         working_dir_var.set("")
 
-    browse_btn = tk.Button(working_dir_entry_frame, text="Browse...", command=browse_working_directory)
+    browse_btn = tk.Button(working_dir_entry_frame, text="Browse...",
+                           command=browse_working_directory)
     browse_btn.pack(side=tk.RIGHT, padx=(0, 5))
 
-    clear_btn = tk.Button(working_dir_entry_frame, text="Clear", command=clear_working_directory)
+    clear_btn = tk.Button(working_dir_entry_frame, text="Clear",
+                          command=clear_working_directory)
     clear_btn.pack(side=tk.RIGHT)
 
     # Saved devices section
