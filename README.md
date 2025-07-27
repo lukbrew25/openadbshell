@@ -74,20 +74,20 @@ openadbshell/
 | clear                        | Clear the console                                                                 |
 | clr                          | Alias for clear                                                                   |
 | help                         | Show this help message                                                            |
-| save <ip:port> --name <name> | Save the current ADB connection to a callable name                                |
-| connectsaved <name>          | Load a saved ADB connection by name                                               |
-| disconnectsaved <name>       | Disconnect a saved ADB connection by name                                         |
-| removesaved <name>           | Remove a saved connection by name                                                 |
+| save [ip:port] --name [name] | Save the current ADB connection to a callable name                                |
+| connectsaved [name]          | Load a saved ADB connection by name                                               |
+| disconnectsaved [name]       | Disconnect a saved ADB connection by name                                         |
+| removesaved [name]           | Remove a saved connection by name                                                 |
 | installedapps                | List installed apps on connected devices                                          |
-| apppath <package>            | Show the path to the APK file for a package                                       |
-| localconnect <port>          | Connect to a local ADB server by port                                             |
-| localdisconnect <port>       | Disconnect from a local ADB server by port                                        |
+| apppath [package]            | Show the path to the APK file for a package                                       |
+| localconnect [port]          | Connect to a local ADB server by port                                             |
+| localdisconnect [port]       | Disconnect from a local ADB server by port                                        |
 | wsaconnect                   | Connect to the default WSA ADB port (58526)                                       |
 | wsadisconnect                | Disconnect from the default WSA ADB port (58526)                                  |
 | connect wsa                  | Alias for wsaconnect                                                              |
 | disconnect wsa               | Alias for wsadisconnect                                                           |
-| shpm <command>               | Execute a shell pm command on the device                                          |
-| adb <args>                   | Run any ADB command (with or without the prefix)                                  |
+| shpm [command]               | Execute a shell pm command on the device                                          |
+| adb [args]                   | Run any ADB command (with or without the prefix)                                  |
 | about                        | Show information about OpenADB Shell                                              |
 
 ## Configuration
