@@ -6,22 +6,29 @@ import datetime
 from threading import Thread
 from pypresence import Presence
 
+# Convert all relative paths to absolute paths at script start
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+MODS_DIR = os.path.join(ROOT_DIR, "mods")
+RICH_PRESENCE_ENABLED = os.path.join(SCRIPT_DIR, "enabled.dat")
+DEVICES_FILE = os.path.join(MODS_DIR, "devices.dat")
+RUNNING_FILE = os.path.join(MODS_DIR, "running.dat")
+
 
 def update_vars():
     """Update variables from files"""
     global enabled_rich_presence, devices, exiting
     try:
         while True:
-            with open(os.path.join("mods", "rich_presence",
-                                   "enabled.dat"), "r", encoding="utf-8"
+            with open(RICH_PRESENCE_ENABLED, "r", encoding="utf-8"
                       ) as datafile:
                 enabled_rich_presence = datafile.read().strip() == "1"
                 datafile.close()
-            with open(os.path.join("mods", "devices.dat"),
+            with open(DEVICES_FILE,
                       "r", encoding="utf-8") as datafile:
                 devices = datafile.read().strip()
                 datafile.close()
-            with open(os.path.join("mods", "running.dat"), "r", encoding="utf-8") as datafile:
+            with open(RUNNING_FILE, "r", encoding="utf-8") as datafile:
                 running = datafile.read().strip()
                 datafile.close()
                 if running:
@@ -37,18 +44,18 @@ def update_vars():
 
 try:
     exiting = False
-    if not os.path.exists(os.path.join("mods", "rich_presence", "enabled.dat")):
-        with open(os.path.join("mods", "rich_presence", "enabled.dat"), "w", encoding="utf-8") as f:
+    if not os.path.exists(RICH_PRESENCE_ENABLED):
+        with open(RICH_PRESENCE_ENABLED, "w", encoding="utf-8") as f:
             f.write("1")
             f.close()
-    if not os.path.exists(os.path.join("mods", "devices.dat")):
-        with open(os.path.join("mods", "devices.dat"), "w", encoding="utf-8") as f:
+    if not os.path.exists(DEVICES_FILE):
+        with open(DEVICES_FILE, "w", encoding="utf-8") as f:
             f.write("0")
             f.close()
-    with open(os.path.join("mods", "rich_presence", "enabled.dat"), "r", encoding="utf-8") as f:
+    with open(RICH_PRESENCE_ENABLED, "r", encoding="utf-8") as f:
         enabled_rich_presence = f.read().strip() == "1"
         f.close()
-    with open(os.path.join("mods", "devices.dat"), "r", encoding="utf-8") as f:
+    with open(DEVICES_FILE, "r", encoding="utf-8") as f:
         devices = f.read().strip()
         f.close()
     Thread(target=update_vars, daemon=True).start()
