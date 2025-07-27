@@ -11,47 +11,19 @@ import sys
 import os
 from time import sleep
 import tkinter as tk
-from tkinter import BooleanVar, messagebox, filedialog
+from tkinter import BooleanVar, messagebox
 from tkinter import ttk
 import datetime
 from threading import Thread, Event
 
-# Convert all relative paths to absolute paths at script start
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE = os.path.join(SCRIPT_DIR, "config.dat")
-ADB_EXECUTABLE = os.path.join(SCRIPT_DIR, "adb", "adb.exe")
-MODS_DIR = os.path.join(SCRIPT_DIR, "mods")
-APKS_DIR = os.path.join(SCRIPT_DIR, "apks")
-RICH_PRESENCE_DIR = os.path.join(MODS_DIR, "rich_presence")
-RICH_PRESENCE_MOD = os.path.join(RICH_PRESENCE_DIR, "mod.exe")
-RICH_PRESENCE_EXE = os.path.join(RICH_PRESENCE_DIR, "presence.exe")
-RICH_PRESENCE_ENABLED = os.path.join(RICH_PRESENCE_DIR, "enabled.dat")
-DEVICES_FILE = os.path.join(MODS_DIR, "devices.dat")
-RUNNING_FILE = os.path.join(MODS_DIR, "running.dat")
-
 
 def save_config():
-    """Save configuration to config.dat file, preserving saved devices."""
+    """Save configuration to config.dat file."""
     try:
-        # Read existing saved device entries
-        saved_device_lines = []
-        if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
-                for line in config_file:
-                    line = line.strip()
-                    if line.startswith("saved_device="):
-                        saved_device_lines.append(line)
-
-        # Write config with preserved saved devices
-        with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
+        with open("config.dat", "w", encoding="utf-8") as config_file:
             config_file.write(f"do_cust_command={do_cust_command}\n")
             config_file.write(f"rich_presence={rich_presence}\n")
             config_file.write(f"do_mods={do_mods}\n")
-            if default_working_dir:
-                config_file.write(f"default_working_dir={default_working_dir}\n")
-            # Write back saved devices
-            for device_line in saved_device_lines:
-                config_file.write(f"{device_line}\n")
             config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
@@ -62,10 +34,9 @@ def load_config():
     global do_cust_command
     global rich_presence
     global do_mods
-    global default_working_dir
     try:
-        if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if line.startswith("do_cust_command="):
@@ -77,17 +48,13 @@ def load_config():
                     if line.startswith("do_mods="):
                         value = line.split("=", 1)[1]
                         do_mods = value.lower() == "true"
-                    if line.startswith("default_working_dir="):
-                        value = line.split("=", 1)[1]
-                        default_working_dir = value if value else None
                 config_file.close()
         else:
             # Create config file with default value if it doesn't exist
-            with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
+            with open("config.dat", "w", encoding="utf-8") as config_file:
                 config_file.write("do_cust_command=True\n")
                 config_file.write("rich_presence=True\n")
                 config_file.write("do_mods=False\n")
-                config_file.write("default_working_dir=\n")
                 config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
@@ -97,8 +64,8 @@ def load_saved_devices():
     """Load saved devices from config.dat file."""
     saved_devices = []
     try:
-        if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if line.startswith("saved_device="):
@@ -126,15 +93,15 @@ def save_saved_devices(devices):
     try:
         # Read existing non-device config entries
         other_configs = []
-        if os.path.exists(CONFIG_FILE):
-            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+        if os.path.exists("config.dat"):
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if not line.startswith("saved_device="):
                         other_configs.append(line)
 
         # Write all config entries back
-        with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
+        with open("config.dat", "w", encoding="utf-8") as config_file:
             for config_line in other_configs:
                 if config_line:  # Skip empty lines
                     config_file.write(f"{config_line}\n")
@@ -149,17 +116,17 @@ def save_saved_devices(devices):
 def clear_all_saved_devices():
     """Clear all saved devices immediately."""
     try:
-        if os.path.exists(CONFIG_FILE):
+        if os.path.exists("config.dat"):
             # Read existing non-device config entries
             other_configs = []
-            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+            with open("config.dat", "r", encoding="utf-8") as config_file:
                 for line in config_file:
                     line = line.strip()
                     if not line.startswith("saved_device="):
                         other_configs.append(line)
 
             # Write back only non-device config entries
-            with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
+            with open("config.dat", "w", encoding="utf-8") as config_file:
                 for config_line in other_configs:
                     if config_line:  # Skip empty lines
                         config_file.write(f"{config_line}\n")
@@ -174,18 +141,14 @@ def open_config_window():  # pylint: disable=too-many-statements
     global do_cust_command
     global rich_presence
     global do_mods
-    global default_working_dir
 
     def save_and_close():
         global do_cust_command
         global rich_presence
         global do_mods
-        global default_working_dir
         do_cust_command = cust_command_var.get()
         rich_presence = rich_presence_var.get()
         do_mods = do_mods_var.get()
-        working_dir_value = working_dir_var.get()
-        default_working_dir = working_dir_value if working_dir_value.strip() else None
         save_config()
 
         # Save devices from the table
@@ -252,46 +215,6 @@ def open_config_window():  # pylint: disable=too-many-statements
     do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (unsecure)",
                                  variable=do_mods_var)
     do_mods_chk.pack(anchor=tk.W)
-
-    # Working directory section
-    working_dir_frame = tk.LabelFrame(config_win, text="Default Working Directory", padx=5, pady=5)
-    working_dir_frame.pack(fill=tk.X, padx=10, pady=5)
-
-    # Working directory controls
-    working_dir_controls_frame = tk.Frame(working_dir_frame)
-    working_dir_controls_frame.pack(fill=tk.X, pady=5)
-
-    tk.Label(working_dir_controls_frame, text="Current Directory:").pack(anchor=tk.W)
-
-    working_dir_entry_frame = tk.Frame(working_dir_controls_frame)
-    working_dir_entry_frame.pack(fill=tk.X, pady=2)
-
-    working_dir_var = tk.StringVar(value=default_working_dir if default_working_dir else "")
-    working_dir_entry = tk.Entry(working_dir_entry_frame,
-                                 textvariable=working_dir_var, state='readonly')
-    working_dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-
-    def browse_working_directory():
-        """Browse for a working directory."""
-        directory = filedialog.askdirectory(
-            title="Select Default Working Directory",
-            initialdir=default_working_dir if default_working_dir and os.path.exists(
-                default_working_dir) else os.getcwd()
-        )
-        if directory:
-            working_dir_var.set(directory)
-
-    def clear_working_directory():
-        """Clear the working directory setting."""
-        working_dir_var.set("")
-
-    browse_btn = tk.Button(working_dir_entry_frame, text="Browse...",
-                           command=browse_working_directory)
-    browse_btn.pack(side=tk.RIGHT, padx=(0, 5))
-
-    clear_btn = tk.Button(working_dir_entry_frame, text="Clear",
-                          command=clear_working_directory)
-    clear_btn.pack(side=tk.RIGHT)
 
     # Saved devices section
     devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
@@ -428,7 +351,7 @@ def autoconnect_on_startup():
         for device in saved_devices:
             if device.get('autoconnect', False):
                 print(f"Auto-connecting to {device['name']} ({device['ip_port']})...")
-                run_command = f"{ADB_EXECUTABLE} connect {device['ip_port']}"
+                run_command = f"adb\\adb.exe connect {device['ip_port']}"
                 if run_and_stream_command(run_command):
                     print(f"Successfully auto-connected to {device['name']}")
                 else:
@@ -477,7 +400,7 @@ def update_rich_presence():
     global rich_presence, rich_presence_exists
     while True:
         if rich_presence_exists:
-            with open(RICH_PRESENCE_ENABLED, "w", encoding="utf-8") as f:
+            with open("mods/rich_presence/enabled.dat", "w", encoding="utf-8") as f:
                 f.write("1" if rich_presence else "0")
                 f.close()
         sleep(10)
@@ -486,15 +409,15 @@ def update_rich_presence():
 def mod_running_check():
     """Allow mods to check if shell is still running."""
     while True:
-        with open(RUNNING_FILE, "w", encoding="utf-8") as f:
+        with open("mods/running.dat", "w", encoding="utf-8") as f:
             f.write(str(datetime.datetime.now()))
             f.close()
         sleep(10)
 
 
 try:
-    if not os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+    if not os.path.exists("config.dat"):
+        with open("config.dat", "w", encoding="utf-8") as f:
             f.write("do_cust_command=True\n")
             f.write("rich_presence=True\n")
             f.write("do_mods=False\n")
@@ -508,7 +431,7 @@ def count_connected_devices():
     while True:
         global devices
         try:
-            result = subprocess.run([ADB_EXECUTABLE, "devices"],
+            result = subprocess.run(["adb\\adb.exe", "devices"],
                                     capture_output=True, text=True,
                                     check=False)
             lines = result.stdout.strip().split("\n")[1:]
@@ -517,16 +440,15 @@ def count_connected_devices():
         except Exception as e:
             print(f"Error counting devices: {e}")
             devices = 0
-        with open(DEVICES_FILE, "w", encoding="utf-8") as f:
+        with open("mods/devices.dat", "w", encoding="utf-8") as f:
             f.write(str(devices))
             f.close()
         sleep(10)
 
 
-if (os.path.exists(RICH_PRESENCE_MOD) and
-        os.path.exists(RICH_PRESENCE_EXE)):
+if (os.path.exists(os.path.join("mods", "rich_presence", "mod.exe")) and
+        os.path.exists(os.path.join("mods", "rich_presence", "presence.exe"))):
     rich_presence_exists = True
-    print("Rich Presence mod found")
 else:
     rich_presence_exists = False
     print("Rich Presence mod not found, disabling all Rich Presence functionality.")
@@ -541,7 +463,6 @@ Thread(target=count_connected_devices, daemon=True).start()
 do_cust_command = True
 rich_presence = True
 do_mods = False
-default_working_dir = None
 load_config()
 if rich_presence_exists:
     Thread(target=update_rich_presence, daemon=True).start()
@@ -554,26 +475,26 @@ print("Created by lukbrew25")
 print("Fully open source software, available on GitHub")
 print("https://github.com/lukbrew25/openadbshell")
 print("--------------------------------------------")
-if not os.path.exists(ADB_EXECUTABLE):
+if not os.path.exists("adb\\adb.exe"):
     print("ADB executable not found in 'adb' directory. Please ensure you have the android "
           "platform tools files in the adb folder.")
     sleep(5)
     sys.exit(1)
-run_and_stream_command(f"{ADB_EXECUTABLE} version")
+run_and_stream_command("adb\\adb.exe version")
 print("--------------------------------------------")
 
-if os.path.exists(MODS_DIR) and do_mods:
+if os.path.exists("mods") and do_mods:
     mods = []
-    for item in os.listdir(MODS_DIR):
-        if os.path.isdir(os.path.join(MODS_DIR, item)) and item != "rich_presence":
-            files = os.listdir(os.path.join(MODS_DIR, item))
+    for item in os.listdir("mods"):
+        if os.path.isdir(os.path.join("mods", item)) and item != "rich_presence":
+            files = os.listdir(os.path.join("mods", item))
             for file in files:
                 if file == "mod.exe":
                     mods.append(item)
     if mods:
         for mod in mods:
             print(f"Mod {mod} found, running...")
-            run_and_stream_command(os.path.join(MODS_DIR, mod, "mod.exe"))
+            run_and_stream_command(f"mods\\{mod}\\mod.exe")
     else:
         print("No mods found in the 'mods' directory.")
 elif do_mods:
@@ -582,25 +503,12 @@ else:
     print("Mods are disabled in the configuration.")
 
 if rich_presence_exists:
-    run_and_stream_command(RICH_PRESENCE_MOD)
+    run_and_stream_command("mods\\rich_presence\\mod.exe")
 
 print("--------------------------------------------")
 print("Loading saved devices...")
 autoconnect_on_startup()
-run_and_stream_command(f"{ADB_EXECUTABLE} devices")
 print("--------------------------------------------")
-
-if default_working_dir:
-    if os.path.exists(default_working_dir):
-        os.chdir(default_working_dir)
-        print(f"Default working directory set to: {default_working_dir}")
-    else:
-        print(f"Default working directory '{default_working_dir}' does not exist, "
-              "using current directory instead.")
-else:
-    print("Default working directory not set, using current directory.")
-
-print("---------------------------------------------")
 
 while True:
     user_command = str(input("openadbshell:"))
@@ -610,7 +518,7 @@ while True:
         disconnect = input("Would you like to disconnect from all devices before "
                            "exiting? (y/n): ")
         if disconnect.lower().startswith('y'):
-            run_and_stream_command(f"{ADB_EXECUTABLE} disconnect")
+            run_and_stream_command("adb\\adb.exe disconnect")
             devices = 0
         print("Exiting adb shell.")
         sys.exit(0)
@@ -657,7 +565,6 @@ while True:
         print("  installedapps - List installed apps on connected devices")
         print("  installapp - Install all apks (must belong to same app) "
               "in the 'apks' folder to all connected devices")
-        print("  setworkingdir <path> - Set the working directory")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
         print("  localdisconnect <port> - Disconnect from "
@@ -675,24 +582,14 @@ while True:
         print("")
         print("Note: Devices with autoconnect enabled will automatically connect on startup.")
     elif do_cust_command and user_command.lower() == "installedapps":
-        run_command = f"{ADB_EXECUTABLE} shell pm list packages"
+        run_command = "adb\\adb.exe shell pm list packages"
         run_and_stream_command(run_command)
-    elif do_cust_command and user_command.lower().startswith("setworkingdir "):
-        new_dir = user_command[14:].strip()
-        if not new_dir:
-            print("Error: Please provide a valid directory path.")
-            continue
-        if not os.path.isdir(new_dir):
-            print(f"Error: The directory '{new_dir}' does not exist.")
-            continue
-        os.chdir(new_dir)
-        print(f"Working directory set to: {os.getcwd()}")
     elif do_cust_command and user_command.startswith("apppath "):
         package_name = user_command[8:].strip()
         if not package_name:
             print("Error: Please provide a package name.")
             continue
-        run_command = f"{ADB_EXECUTABLE} shell pm path " + str(package_name)
+        run_command = "adb\\adb.exe shell pm path " + str(package_name)
         run_and_stream_command(run_command)
     elif do_cust_command and user_command.lower().startswith("localconnect "):
         port = user_command[13:].strip()
@@ -702,7 +599,7 @@ while True:
             else:
                 print("Error: Please provide a valid port number.")
                 continue
-        run_command = f"{ADB_EXECUTABLE} connect localhost:" + str(port)
+        run_command = "adb\\adb.exe connect localhost:" + str(port)
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower().startswith("localdisconnect "):
@@ -713,25 +610,25 @@ while True:
             else:
                 print("Error: Please provide a valid port number.")
                 continue
-        run_command = f"{ADB_EXECUTABLE} disconnect localhost:" + str(port)
+        run_command = "adb\\adb.exe disconnect localhost:" + str(port)
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "wsaconnect":
-        run_command = f"{ADB_EXECUTABLE} connect localhost:58526"
+        run_command = "adb\\adb.exe connect localhost:58526"
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower() == "wsadisconnect":
-        run_command = f"{ADB_EXECUTABLE} disconnect localhost:58526"
+        run_command = "adb\\adb.exe disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "connect wsa":
-        run_command = f"{ADB_EXECUTABLE} connect localhost:58526"
+        run_command = "adb\\adb.exe connect localhost:58526"
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower() == "disconnect wsa":
-        run_command = f"{ADB_EXECUTABLE} disconnect localhost:58526"
+        run_command = "adb\\adb.exe disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
@@ -745,7 +642,7 @@ while True:
         if not ip_port or not name:
             print("Error: Please provide both IP:port and a name.")
             continue
-        with open(CONFIG_FILE, "a", encoding="utf-8") as f:
+        with open("config.dat", "a", encoding="utf-8") as f:
             f.write(f"saved_device={name}/!/{ip_port}/!/False\n")
             f.close()
     elif do_cust_command and user_command.lower().startswith("removesaved "):
@@ -754,10 +651,10 @@ while True:
             print("Error: Please provide a name for the saved device.")
             continue
         try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            with open("config.dat", "r", encoding="utf-8") as f:
                 lines = f.readlines()
                 f.close()
-            with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            with open("config.dat", "w", encoding="utf-8") as f:
                 for line in lines:
                     if not line.startswith(f"saved_device={name}/!/"):
                         f.write(line)
@@ -770,13 +667,13 @@ while True:
             print("Error: Please provide a name for the saved device.")
             continue
         try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            with open("config.dat", "r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
                         parts = line.strip().split("/!/")
                         if len(parts) >= 2:
                             ip_port = parts[1]
-                            run_command = f"{ADB_EXECUTABLE} connect {ip_port}"
+                            run_command = f"adb\\adb.exe connect {ip_port}"
                             run_and_stream_command(run_command)
                             break
                 else:
@@ -790,13 +687,13 @@ while True:
             print("Error: Please provide a name for the saved device.")
             continue
         try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            with open("config.dat", "r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith(f"saved_device={name}/!/"):
                         parts = line.strip().split("/!/")
                         if len(parts) >= 2:
                             ip_port = parts[1]
-                            run_command = f"{ADB_EXECUTABLE} disconnect {ip_port}"
+                            run_command = f"adb\\adb.exe disconnect {ip_port}"
                             run_and_stream_command(run_command)
                             break
                 else:
@@ -805,13 +702,13 @@ while True:
         except Exception as e:
             print(f"Error reading config.dat: {e}")
     elif do_cust_command and user_command.lower().startswith("shpm "):
-        run_command = f"{ADB_EXECUTABLE} shell pm " + user_command[5:]
+        run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
-        run_command = f"{ADB_EXECUTABLE} " + user_command[4:]
+        run_command = "adb\\adb.exe " + user_command[4:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb.exe "):
-        run_command = f"{ADB_EXECUTABLE} " + user_command[8:]
+        run_command = "adb\\adb.exe " + user_command[8:]
         run_and_stream_command(run_command)
     elif user_command.startswith("cmd ") and do_cust_command:
         run_command = "cmd.exe /c " + user_command[4:]
@@ -829,17 +726,17 @@ while True:
         run_command = "powershell.exe -Command " + user_command[5:]
         run_and_stream_command(run_command)
     elif do_cust_command and user_command.lower() == "installapp":
-        if not os.path.exists(APKS_DIR):
+        if not os.path.exists("apks"):
             print("Error: 'apks' directory not found. Please create an 'apks' directory "
                   "and place your APK files there.")
         else:
-            apk_files = [f for f in os.listdir(APKS_DIR) if f.endswith('.apk')]
+            apk_files = [f for f in os.listdir("apks") if f.endswith('.apk')]
             if not apk_files:
                 print("No APK files found in the 'apks' directory.")
             else:
-                run_command = f"{ADB_EXECUTABLE} install-multiple -r " + " ".join(
-                    [os.path.join(APKS_DIR, apk) for apk in apk_files])
+                run_command = "adb\\adb.exe install-multiple -r " + " ".join(
+                    [os.path.join("apks", apk) for apk in apk_files])
                 run_and_stream_command(run_command)
     else:
-        run_command = f"{ADB_EXECUTABLE} " + user_command
+        run_command = "adb\\adb.exe " + user_command
         run_and_stream_command(run_command)
