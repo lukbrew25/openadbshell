@@ -703,43 +703,25 @@ while True:
     elif do_cust_command and user_command.lower().startswith("shpm "):
         run_command = "adb\\adb.exe shell pm " + user_command[5:]
         run_and_stream_command(run_command)
-    elif (user_command.startswith("connect ") or user_command.startswith("adb connect ")
-          or user_command.startswith("adb.exe connect ")):
-        if user_command.startswith("connect "):
-            run_command = "adb\\adb.exe connect " + user_command[8:]
-        elif user_command.startswith("adb connect "):
-            run_command = "adb\\adb.exe connect " + user_command[12:]
-        else:
-            run_command = "adb\\adb.exe connect " + user_command[16:]
-        run_and_stream_command(run_command)
-    elif (user_command.startswith("disconnect ") or user_command.startswith("adb disconnect ")
-          or user_command.startswith("adb.exe disconnect ")):
-        if user_command.startswith("disconnect "):
-            run_command = "adb\\adb.exe disconnect " + user_command[11:]
-        elif user_command.startswith("adb disconnect "):
-            run_command = "adb\\adb.exe disconnect " + user_command[15:]
-        else:
-            run_command = "adb\\adb.exe disconnect " + user_command[19:]
-        run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
         run_command = "adb\\adb.exe " + user_command[4:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb.exe "):
         run_command = "adb\\adb.exe " + user_command[8:]
         run_and_stream_command(run_command)
-    elif user_command.startswith("cmd "):
+    elif user_command.startswith("cmd ") and do_cust_command:
         run_command = "cmd.exe /c " + user_command[4:]
         run_and_stream_command(run_command)
-    elif user_command.startswith("cmd.exe "):
+    elif user_command.startswith("cmd.exe ") and do_cust_command:
         run_command = "cmd.exe /c " + user_command[8:]
         run_and_stream_command(run_command)
-    elif user_command.startswith("powershell "):
+    elif user_command.startswith("powershell ") and do_cust_command:
         run_command = "powershell.exe -Command " + user_command[11:]
         run_and_stream_command(run_command)
-    elif user_command.startswith("powershell.exe "):
+    elif user_command.startswith("powershell.exe ") and do_cust_command:
         run_command = "powershell.exe -Command " + user_command[15:]
         run_and_stream_command(run_command)
-    elif user_command.startswith("pwrsh "):
+    elif user_command.startswith("pwrsh ") and do_cust_command:
         run_command = "powershell.exe -Command " + user_command[5:]
         run_and_stream_command(run_command)
     elif do_cust_command and user_command.lower() == "installapp":
