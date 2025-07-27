@@ -563,7 +563,8 @@ while True:
         print("  connectsaved <name> - Connect to a saved device by name")
         print("  disconnectsaved <name> - Disconnect from a saved device by name")
         print("  installedapps - List installed apps on connected devices")
-        print("  installapp - Install all apks (must belong to same app) in the 'apks' folder to all connected devices")
+        print("  installapp - Install all apks (must belong to same app) "
+              "in the 'apks' folder to all connected devices")
         print("  apppath <com.example.example> - Show the path to the apk file")
         print("  localconnect <port> - Connect to a local adb server by only port")
         print("  localdisconnect <port> - Disconnect from "
