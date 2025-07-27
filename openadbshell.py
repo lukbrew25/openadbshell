@@ -508,6 +508,7 @@ if rich_presence_exists:
 print("--------------------------------------------")
 print("Loading saved devices...")
 autoconnect_on_startup()
+run_and_stream_command("adb\\adb.exe devices")
 print("--------------------------------------------")
 
 while True:
