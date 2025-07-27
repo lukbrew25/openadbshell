@@ -92,7 +92,7 @@ openadbshell/
 | cmd.exe [command]            | Alias for cmd                                      |
 | powershell [command]         | Run any command in PowerShell                      |
 | powershell.exe [command]     | Alias for powershell                               |
-| pwrshell [command]           | Alias for powershell                               |
+| pwrsh [command]              | Alias for powershell                               |
 | about                        | Show information about OpenADB Shell               |
 
 ## Configuration
