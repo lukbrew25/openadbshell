@@ -11,7 +11,7 @@ import sys
 import os
 from time import sleep
 import tkinter as tk
-from tkinter import BooleanVar, messagebox
+from tkinter import BooleanVar, messagebox, filedialog
 from tkinter import ttk
 import datetime
 from threading import Thread, Event
@@ -31,12 +31,27 @@ RUNNING_FILE = os.path.join(MODS_DIR, "running.dat")
 
 
 def save_config():
-    """Save configuration to config.dat file."""
+    """Save configuration to config.dat file, preserving saved devices."""
     try:
+        # Read existing saved device entries
+        saved_device_lines = []
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+                for line in config_file:
+                    line = line.strip()
+                    if line.startswith("saved_device="):
+                        saved_device_lines.append(line)
+
+        # Write config with preserved saved devices
         with open(CONFIG_FILE, "w", encoding="utf-8") as config_file:
             config_file.write(f"do_cust_command={do_cust_command}\n")
             config_file.write(f"rich_presence={rich_presence}\n")
             config_file.write(f"do_mods={do_mods}\n")
+            if default_working_dir:
+                config_file.write(f"default_working_dir={default_working_dir}\n")
+            # Write back saved devices
+            for device_line in saved_device_lines:
+                config_file.write(f"{device_line}\n")
             config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
@@ -47,6 +62,7 @@ def load_config():
     global do_cust_command
     global rich_presence
     global do_mods
+    global default_working_dir
     try:
         if os.path.exists(CONFIG_FILE):
             with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
@@ -61,6 +77,9 @@ def load_config():
                     if line.startswith("do_mods="):
                         value = line.split("=", 1)[1]
                         do_mods = value.lower() == "true"
+                    if line.startswith("default_working_dir="):
+                        value = line.split("=", 1)[1]
+                        default_working_dir = value if value else None
                 config_file.close()
         else:
             # Create config file with default value if it doesn't exist
@@ -154,14 +173,18 @@ def open_config_window():  # pylint: disable=too-many-statements
     global do_cust_command
     global rich_presence
     global do_mods
+    global default_working_dir
 
     def save_and_close():
         global do_cust_command
         global rich_presence
         global do_mods
+        global default_working_dir
         do_cust_command = cust_command_var.get()
         rich_presence = rich_presence_var.get()
         do_mods = do_mods_var.get()
+        working_dir_value = working_dir_var.get()
+        default_working_dir = working_dir_value if working_dir_value.strip() else None
         save_config()
 
         # Save devices from the table
@@ -228,6 +251,42 @@ def open_config_window():  # pylint: disable=too-many-statements
     do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (unsecure)",
                                  variable=do_mods_var)
     do_mods_chk.pack(anchor=tk.W)
+
+    # Working directory section
+    working_dir_frame = tk.LabelFrame(config_win, text="Default Working Directory", padx=5, pady=5)
+    working_dir_frame.pack(fill=tk.X, padx=10, pady=5)
+
+    # Working directory controls
+    working_dir_controls_frame = tk.Frame(working_dir_frame)
+    working_dir_controls_frame.pack(fill=tk.X, pady=5)
+
+    tk.Label(working_dir_controls_frame, text="Current Directory:").pack(anchor=tk.W)
+
+    working_dir_entry_frame = tk.Frame(working_dir_controls_frame)
+    working_dir_entry_frame.pack(fill=tk.X, pady=2)
+
+    working_dir_var = tk.StringVar(value=default_working_dir if default_working_dir else "")
+    working_dir_entry = tk.Entry(working_dir_entry_frame, textvariable=working_dir_var, state='readonly')
+    working_dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+
+    def browse_working_directory():
+        """Browse for a working directory."""
+        directory = filedialog.askdirectory(
+            title="Select Default Working Directory",
+            initialdir=default_working_dir if default_working_dir and os.path.exists(default_working_dir) else os.getcwd()
+        )
+        if directory:
+            working_dir_var.set(directory)
+
+    def clear_working_directory():
+        """Clear the working directory setting."""
+        working_dir_var.set("")
+
+    browse_btn = tk.Button(working_dir_entry_frame, text="Browse...", command=browse_working_directory)
+    browse_btn.pack(side=tk.RIGHT, padx=(0, 5))
+
+    clear_btn = tk.Button(working_dir_entry_frame, text="Clear", command=clear_working_directory)
+    clear_btn.pack(side=tk.RIGHT)
 
     # Saved devices section
     devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
@@ -476,6 +535,7 @@ Thread(target=count_connected_devices, daemon=True).start()
 do_cust_command = True
 rich_presence = True
 do_mods = False
+default_working_dir = None
 load_config()
 if rich_presence_exists:
     Thread(target=update_rich_presence, daemon=True).start()
