@@ -1,4 +1,5 @@
 """OpenADB Shell Rich Presence Module"""
+# pyinstaller presence.py
 from time import time, sleep
 import os
 import sys

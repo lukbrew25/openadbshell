@@ -1,4 +1,5 @@
 """This module starts the Rich Presence Handler."""
+#pyinstaller --onefile mod.py
 import subprocess
 import sys
 
