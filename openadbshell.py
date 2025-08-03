@@ -11,10 +11,12 @@ import sys
 import os
 from time import sleep
 import tkinter as tk
-from tkinter import BooleanVar, messagebox
-from tkinter import ttk
+from tkinter import BooleanVar, messagebox, filedialog, ttk
 import datetime
 from threading import Thread, Event
+
+
+adb_path = "adb\\adb.exe"
 
 
 def save_config():
@@ -24,6 +26,7 @@ def save_config():
             config_file.write(f"do_cust_command={do_cust_command}\n")
             config_file.write(f"rich_presence={rich_presence}\n")
             config_file.write(f"do_mods={do_mods}\n")
+            config_file.write(f"adb_path={adb_path}\n")
             config_file.close()
     except Exception as e:
         print(f"Error saving config: {e}")
@@ -34,6 +37,7 @@ def load_config():
     global do_cust_command
     global rich_presence
     global do_mods
+    global adb_path
     try:
         if os.path.exists("config.dat"):
             with open("config.dat", "r", encoding="utf-8") as config_file:
@@ -48,6 +52,8 @@ def load_config():
                     if line.startswith("do_mods="):
                         value = line.split("=", 1)[1]
                         do_mods = value.lower() == "true"
+                    if line.startswith("adb_path="):
+                        adb_path = line.split("=", 1)[1]
                 config_file.close()
         else:
             # Create config file with default value if it doesn't exist
@@ -55,6 +61,7 @@ def load_config():
                 config_file.write("do_cust_command=True\n")
                 config_file.write("rich_presence=True\n")
                 config_file.write("do_mods=False\n")
+                config_file.write(f"adb_path={adb_path}\n")
                 config_file.close()
     except Exception as e:
         print(f"Error loading config: {e}")
@@ -146,9 +153,15 @@ def open_config_window():  # pylint: disable=too-many-statements
         global do_cust_command
         global rich_presence
         global do_mods
+        global adb_path
         do_cust_command = cust_command_var.get()
         rich_presence = rich_presence_var.get()
         do_mods = do_mods_var.get()
+        adb_path = adb_path_var.get()
+        if not os.path.exists(adb_path):
+            messagebox.showerror("Error", "Selected ADB executable not "
+                                          "found. Resetting to default.")
+            adb_path_var.set("adb\\adb.exe")
         save_config()
 
         # Save devices from the table
@@ -215,6 +228,38 @@ def open_config_window():  # pylint: disable=too-many-statements
     do_mods_chk = tk.Checkbutton(cmd_frame, text="Enable mods (unsecure)",
                                  variable=do_mods_var)
     do_mods_chk.pack(anchor=tk.W)
+
+    # --- ADB Path Section ---
+    adb_frame = tk.LabelFrame(config_win, text="ADB Executable Path", padx=5, pady=5)
+    adb_frame.pack(fill=tk.X, padx=10, pady=5)
+
+    adb_path_var = tk.StringVar(value=adb_path)
+    adb_entry = tk.Entry(adb_frame, textvariable=adb_path_var, width=60)
+    adb_entry.pack(side=tk.LEFT, padx=5)
+
+    def browse_adb():
+        """Open a file dialog to select adb.exe."""
+        file_path = filedialog.askopenfilename(
+            title="Select adb.exe",
+            filetypes=[("ADB Executable", "adb.exe"), ("All Files", "*")]
+        )
+        if file_path:
+            adb_path_var.set(file_path)
+
+    def reset_adb():
+        """Reset the ADB path to the default relative path."""
+        adb_path_var.set("adb\\adb.exe")
+
+    def set_to_path():
+        """Set the ADB path to just 'adb' to use the system PATH."""
+        adb_path_var.set("adb")
+
+    browse_btn = tk.Button(adb_frame, text="Browse", command=browse_adb)
+    browse_btn.pack(side=tk.LEFT, padx=5)
+    reset_btn = tk.Button(adb_frame, text="Reset to Default", command=reset_adb)
+    reset_btn.pack(side=tk.LEFT, padx=5)
+    path_btn = tk.Button(adb_frame, text="Call ADB from Path", command=set_to_path)
+    path_btn.pack(side=tk.LEFT, padx=5)
 
     # Saved devices section
     devices_frame = tk.LabelFrame(config_win, text="Saved Devices", padx=5, pady=5)
@@ -321,6 +366,38 @@ def open_config_window():  # pylint: disable=too-many-statements
     device_tree.bind('<Double-1>', on_double_click)
 
     # Bottom buttons
+
+    def reset_all():
+        """Reset all settings to default."""
+        global do_cust_command, rich_presence, do_mods, adb_path
+        result = messagebox.askyesno("Confirm Reset",
+                                     "Are you sure you want to reset all settings? "
+                                     "This action cannot be undone.")
+        if result:
+            do_cust_command = True
+            rich_presence = True
+            do_mods = False
+            adb_path = "adb\\adb.exe"
+            cust_command_var.set(do_cust_command)
+            rich_presence_var.set(rich_presence)
+            do_mods_var.set(do_mods)
+            adb_path_var.set(adb_path)
+            save_config()
+            # Clear the device table
+            for item in device_tree.get_children():
+                device_tree.delete(item)
+            if os.path.exists("config.dat"):
+                os.remove("config.dat")
+            with open ("config.dat", "w", encoding="utf-8") as f:
+                f.write("do_cust_command=True\n")
+                f.write("rich_presence=True\n")
+                f.write("do_mods=False\n")
+                f.write(f"adb_path={adb_path}\n")
+                f.close()
+            messagebox.showinfo("Success", "All settings have "
+                                           "been reset to default. You may have to relaunch "
+                                           "this shell for some changes to take effect.")
+
     btn_frame = tk.Frame(config_win)
     btn_frame.pack(fill=tk.X, padx=10, pady=10)
 
@@ -329,6 +406,13 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     exit_btn = tk.Button(btn_frame, text="Cancel", command=config_win.destroy)
     exit_btn.pack(side=tk.LEFT, padx=5)
+
+    reset_all_btn = tk.Button(
+        btn_frame,
+        text="Reset All",
+        command=reset_all,
+    )
+    reset_all_btn.pack(side=tk.LEFT, padx=5)
 
     # Instructions
     instructions = tk.Label(config_win,
@@ -351,7 +435,7 @@ def autoconnect_on_startup():
         for device in saved_devices:
             if device.get('autoconnect', False):
                 print(f"Auto-connecting to {device['name']} ({device['ip_port']})...")
-                run_command = f"adb\\adb.exe connect {device['ip_port']}"
+                run_command = f"{adb_path} connect {device['ip_port']}"
                 if run_and_stream_command(run_command):
                     print(f"Successfully auto-connected to {device['name']}")
                 else:
@@ -421,6 +505,7 @@ try:
             f.write("do_cust_command=True\n")
             f.write("rich_presence=True\n")
             f.write("do_mods=False\n")
+            f.write(f"adb_path={adb_path}\n")
             f.close()
 except Exception as e:
     print(f"Error creating config file: {e}")
@@ -431,7 +516,7 @@ def count_connected_devices():
     while True:
         global devices
         try:
-            result = subprocess.run(["adb\\adb.exe", "devices"],
+            result = subprocess.run([adb_path, "devices"],
                                     capture_output=True, text=True,
                                     check=False)
             lines = result.stdout.strip().split("\n")[1:]
@@ -475,12 +560,13 @@ print("Created by lukbrew25")
 print("Fully open source software, available on GitHub")
 print("https://github.com/lukbrew25/openadbshell")
 print("--------------------------------------------")
-if not os.path.exists("adb\\adb.exe"):
+if not os.path.exists(adb_path):
     print("ADB executable not found in 'adb' directory. Please ensure you have the android "
-          "platform tools files in the adb folder.")
-    sleep(5)
+          "platform tools files in the adb folder. Once those files are in place, you can "
+          "optionally pick a custom adb executable and location. Exiting...")
+    sleep(10)
     sys.exit(1)
-run_and_stream_command("adb\\adb.exe version")
+run_and_stream_command(adb_path + " version")
 print("--------------------------------------------")
 
 if os.path.exists("mods") and do_mods:
@@ -508,7 +594,7 @@ if rich_presence_exists:
 print("--------------------------------------------")
 print("Loading saved devices...")
 autoconnect_on_startup()
-run_and_stream_command("adb\\adb.exe devices")
+run_and_stream_command(adb_path + " devices")
 print("--------------------------------------------")
 
 while True:
@@ -519,7 +605,7 @@ while True:
         disconnect = input("Would you like to disconnect from all devices before "
                            "exiting? (y/n): ")
         if disconnect.lower().startswith('y'):
-            run_and_stream_command("adb\\adb.exe disconnect")
+            run_and_stream_command(adb_path + " disconnect")
             devices = 0
         print("Exiting adb shell.")
         sys.exit(0)
@@ -583,14 +669,14 @@ while True:
         print("")
         print("Note: Devices with autoconnect enabled will automatically connect on startup.")
     elif do_cust_command and user_command.lower() == "installedapps":
-        run_command = "adb\\adb.exe shell pm list packages"
+        run_command = adb_path + " shell pm list packages"
         run_and_stream_command(run_command)
     elif do_cust_command and user_command.startswith("apppath "):
         package_name = user_command[8:].strip()
         if not package_name:
             print("Error: Please provide a package name.")
             continue
-        run_command = "adb\\adb.exe shell pm path " + str(package_name)
+        run_command = adb_path + " shell pm path " + str(package_name)
         run_and_stream_command(run_command)
     elif do_cust_command and user_command.lower().startswith("localconnect "):
         port = user_command[13:].strip()
@@ -600,7 +686,7 @@ while True:
             else:
                 print("Error: Please provide a valid port number.")
                 continue
-        run_command = "adb\\adb.exe connect localhost:" + str(port)
+        run_command = adb_path + " connect localhost:" + str(port)
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower().startswith("localdisconnect "):
@@ -611,25 +697,25 @@ while True:
             else:
                 print("Error: Please provide a valid port number.")
                 continue
-        run_command = "adb\\adb.exe disconnect localhost:" + str(port)
+        run_command = adb_path + " disconnect localhost:" + str(port)
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "wsaconnect":
-        run_command = "adb\\adb.exe connect localhost:58526"
+        run_command = adb_path + " connect localhost:58526"
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower() == "wsadisconnect":
-        run_command = "adb\\adb.exe disconnect localhost:58526"
+        run_command = adb_path + " disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
     elif do_cust_command and user_command.lower() == "connect wsa":
-        run_command = "adb\\adb.exe connect localhost:58526"
+        run_command = adb_path + " connect localhost:58526"
         if run_and_stream_command(run_command):
             devices += 1
     elif do_cust_command and user_command.lower() == "disconnect wsa":
-        run_command = "adb\\adb.exe disconnect localhost:58526"
+        run_command = adb_path + " disconnect localhost:58526"
         if run_and_stream_command(run_command):
             devices -= 1
             devices = max(devices, 0)
@@ -674,7 +760,7 @@ while True:
                         parts = line.strip().split("/!/")
                         if len(parts) >= 2:
                             ip_port = parts[1]
-                            run_command = f"adb\\adb.exe connect {ip_port}"
+                            run_command = f"{adb_path} connect {ip_port}"
                             run_and_stream_command(run_command)
                             break
                 else:
@@ -694,7 +780,7 @@ while True:
                         parts = line.strip().split("/!/")
                         if len(parts) >= 2:
                             ip_port = parts[1]
-                            run_command = f"adb\\adb.exe disconnect {ip_port}"
+                            run_command = f"{adb_path} disconnect {ip_port}"
                             run_and_stream_command(run_command)
                             break
                 else:
@@ -703,13 +789,13 @@ while True:
         except Exception as e:
             print(f"Error reading config.dat: {e}")
     elif do_cust_command and user_command.lower().startswith("shpm "):
-        run_command = "adb\\adb.exe shell pm " + user_command[5:]
+        run_command = adb_path + " shell pm " + user_command[5:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb "):
-        run_command = "adb\\adb.exe " + user_command[4:]
+        run_command = adb_path + " " + user_command[4:]
         run_and_stream_command(run_command)
     elif user_command.startswith("adb.exe "):
-        run_command = "adb\\adb.exe " + user_command[8:]
+        run_command = adb_path + " " + user_command[8:]
         run_and_stream_command(run_command)
     elif user_command.startswith("cmd ") and do_cust_command:
         run_command = "cmd.exe /c " + user_command[4:]
@@ -735,9 +821,9 @@ while True:
             if not apk_files:
                 print("No APK files found in the 'apks' directory.")
             else:
-                run_command = "adb\\adb.exe install-multiple -r " + " ".join(
+                run_command = adb_path + " install-multiple -r " + " ".join(
                     [os.path.join("apks", apk) for apk in apk_files])
                 run_and_stream_command(run_command)
     else:
-        run_command = "adb\\adb.exe " + user_command
+        run_command = adb_path + " " + user_command
         run_and_stream_command(run_command)
