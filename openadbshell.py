@@ -388,7 +388,7 @@ def open_config_window():  # pylint: disable=too-many-statements
                 device_tree.delete(item)
             if os.path.exists("config.dat"):
                 os.remove("config.dat")
-            with open ("config.dat", "w", encoding="utf-8") as f:
+            with open("config.dat", "w", encoding="utf-8") as f:
                 f.write("do_cust_command=True\n")
                 f.write("rich_presence=True\n")
                 f.write("do_mods=False\n")
