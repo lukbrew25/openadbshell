@@ -35,9 +35,9 @@ def update_vars():
     except Exception as e:
         print(f"Error reading files: {e}")
 
-
+RPC = None
+exiting = False
 try:
-    exiting = False
     if not os.path.exists(os.path.join("mods", "rich_presence", "enabled.dat")):
         with open(os.path.join("mods", "rich_presence", "enabled.dat"), "w", encoding="utf-8") as f:
             f.write("1")
@@ -65,7 +65,7 @@ try:
                        start=start)
             sleep(15)
             while not exiting:
-                if not enabled_rich_presence:
+                if not enabled_rich_presence or exiting:
                     RPC.close()
                     break
                 RPC.update(state="Connected to " + str(devices) +
@@ -73,8 +73,14 @@ try:
                                  "https://github.com/lukbrew25/openadbshell",
                            start=start)
                 sleep(15)
+        if not enabled_rich_presence or exiting:
+            if RPC:
+                RPC.close()
+            break
         sleep(30)
 except Exception as e:
     print(f"Error in Rich Presence: {e}")
 
+if RPC:
+    RPC.close()
 sys.exit(0)
