@@ -35,6 +35,7 @@ def update_vars():
     except Exception as e:
         print(f"Error reading files: {e}")
 
+
 RPC = None
 exiting = False
 try:
