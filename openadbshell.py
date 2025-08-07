@@ -632,11 +632,11 @@ while True:
         print("Use at your own risk. The developer is not responsible "
               "for any damage or data loss.")
         print("This project and lukbrew25 are not affiliated with or "
-              "sponsored by Google, Android, ADB, "
-              "Windows, Microsoft, Discord, the Python foundation, "
+              "sponsored by Google, Microsoft, "
+              "Discord, the Python foundation, "
               "the pypresence and pyinstaller projects, "
               "or any other third-party software, entity, "
-              "organization, or company.")
+              "organization, or company and so such claims are made.")
     elif do_cust_command and user_command.lower() == "help":
         print("Available commands:")
         print("  config - Open the configuration window to enable/disable "
