@@ -22,7 +22,7 @@ OpenADB Shell is a simple, open source command-line interface for interacting wi
 
 ## Installation
 1. Download the latest release zip from [GitHub Releases](https://github.com/lukbrew25/openadbshell/releases).
-2. Unzip the file into a folder (e.g., your Documents folder). Note: This app is fully portable and can bbe run from any non-protected directory.
+2. Unzip the file into a folder (e.g., your Documents folder). Note: This app is fully portable and can be run from any non-protected directory.
 3. Download the latest Android SDK Platform Tools for Windows: [Platform Tools Download](https://developer.android.com/tools/releases/platform-tools)
 4. In your `openadbshell` directory, create a folder named `adb`.
 5. Unzip the platform tools and move all files directly into the `adb` folder (so you have `adb/adb.exe`, etc.).
