@@ -627,7 +627,7 @@ while True:
         print("Rich presence disabled.")
     elif user_command.lower() == "config rich_presence delete":
         print("Deleting rich presence itself is highly discouraged. "
-              "You will not be able to re-enable. " 
+              "You will not be able to re-enable. "
               "Are you sure you want to permanently delete this functionality? (y/n)")
         do_deletion = input()
         if do_deletion.lower() == "y":
