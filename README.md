@@ -1,4 +1,4 @@
-# OpenADB Shell (v2 Release!)
+# OpenADB Shell (v2.1 Release!)
 
 OpenADB Shell is a simple, open source command-line interface for interacting with ADB (Android Debug Bridge) on Windows. It provides a user-friendly shell with custom commands, configuration options, and direct access to standard ADB commands.
 
@@ -64,53 +64,62 @@ openadbshell/
 - Type `help` for a list of available custom commands.
 - Type any standard ADB command (without the `adb.exe` prefix) to run it directly.
 - Type `config` to open the configuration window and enable/disable custom commands and manage custom devices saved.
-- If custom commands are disabled, only standard ADB commands will work (except `config`).
+- If custom commands are disabled, only standard ADB commands will work (except all config commands).
 
 ## Available Shell-Specific Commands (run help for more info)
-| Command                      | Description                                                                |
-|------------------------------|----------------------------------------------------------------------------|
-| config                       | Open the configuration window                                              |
-| exit                         | Exit the shell (optionally disconnect all devices)                         |
-| clear                        | Clear the console                                                          |
-| clr                          | Alias for clear                                                            |
-| help                         | Show this help message                                                     |
-| save [ip:port] --name [name] | Save the current ADB connection to a callable name                         |
-| connectsaved [name]          | Load a saved ADB connection by name                                        |
-| disconnectsaved [name]       | Disconnect a saved ADB connection by name                                  |
-| removesaved [name]           | Remove a saved connection by name                                          |
-| installedapps                | List installed apps on connected devices                                   |
-| installapp                   | Install all apks (must belong to same app) in `apks` folder to all devices |
-| apppath [package]            | Show the path to the APK file for a package                                |
-| localconnect [port]          | Connect to a local ADB server by port                                      |
-| localdisconnect [port]       | Disconnect from a local ADB server by port                                 |
-| wsaconnect                   | Connect to the default WSA ADB port (58526)                                |
-| wsadisconnect                | Disconnect from the default WSA ADB port (58526)                           |
-| connect wsa                  | Alias for wsaconnect                                                       |
-| disconnect wsa               | Alias for wsadisconnect                                                    |
-| shpm [command]               | Execute a shell pm command on the device                                   |
-| adb [command]                | Run any ADB command (with or without the prefix)                           |
-| cmd [command]                | Run any command in command prompt                                          |
-| cmd.exe [command]            | Alias for cmd                                                              |
-| powershell [command]         | Run any command in PowerShell                                              |
-| powershell.exe [command]     | Alias for powershell                                                       |
-| pwrsh [command]              | Alias for powershell                                                       |
-| about                        | Show information about OpenADB Shell                                       |
+| Command                                      | Description                                                                |
+|----------------------------------------------|----------------------------------------------------------------------------|
+| config                                       | Open the configuration window                                              |
+| config rich_presence [enable/disable/delete] | Rich presence config  (enabled by default)                                 |
+| config do_cust_command [enable/disable]      | Enable or disable custom commands (enabled by default)                     |
+| config do_mods [enable/disable]              | Enable or disable mod support (enabled by default)                         |
+| config adb_path [path]                       | Set adb path                                                               |
+| exit                                         | Exit the shell (optionally disconnect all devices)                         |
+| clear                                        | Clear the console                                                          |
+| clr                                          | Alias for clear                                                            |
+| help                                         | Show this help message                                                     |
+| save [ip:port] --name [name]                 | Save the current ADB connection to a callable name                         |
+| connectsaved [name]                          | Load a saved ADB connection by name                                        |
+| disconnectsaved [name]                       | Disconnect a saved ADB connection by name                                  |
+| removesaved [name]                           | Remove a saved connection by name                                          |
+| installedapps                                | List installed apps on connected devices                                   |
+| installapp                                   | Install all apks (must belong to same app) in `apks` folder to all devices |
+| apppath [package]                            | Show the path to the APK file for a package                                |
+| localconnect [port]                          | Connect to a local ADB server by port                                      |
+| localdisconnect [port]                       | Disconnect from a local ADB server by port                                 |
+| wsaconnect                                   | Connect to the default WSA ADB port (58526)                                |
+| wsadisconnect                                | Disconnect from the default WSA ADB port (58526)                           |
+| connect wsa                                  | Alias for wsaconnect                                                       |
+| disconnect wsa                               | Alias for wsadisconnect                                                    |
+| shpm [command]                               | Execute a shell pm command on the device                                   |
+| cmd [command]                                | Run any command in command prompt                                          |
+| cmd.exe [command]                            | Alias for cmd                                                              |
+| powershell [command]                         | Run any command in PowerShell                                              |
+| powershell.exe [command]                     | Alias for powershell                                                       |
+| pwrsh [command]                              | Alias for powershell                                                       |
+| about                                        | Show information about OpenADB Shell                                       |
+| adb [command]                                | Run any ADB command                                                        |
+| adb.exe [command]                            | Run any ADB command                                                        |
+| [command]                                    | Run any ADB command                                                        |
 
 ## Configuration
 - The shell saves your custom command preference in `config.dat`.
-- You can change this at any time by running the `config` command.
+- You can change this at any time by running the `config` command or running one of the dedicated config commands above for particular settings.
+- The config commands are never affected by the do_cust_command setting.
 
 ## Discord Rich Presence
 - OpenADB Shell supports Discord Rich Presence integration.
 - If Discord is running, it will show this app as running in your status and how many devices are connected.
-- You can disable this feature in the configuration window (Enabled by default).
-- You can also permanently remove it by deleting the `rich_presence` folder in the `mods` directory.
+- You can disable this feature in the configuration window (Enabled by default) or by one of the config commands.
+- You can also permanently remove it by deleting the `rich_presence` folder in the `mods` directory or running the config delete command.
 
 ## Mods
 - OpenADB Shell supports mods. Mods are custom executables that are run when the shell starts. Their output is displayed in the shell.
 - All functions of the shell are paused while a mod is running. If the mod is meant to run in the background, I recommend mod.exe simply being the launcher for your mod, which then runs in the background (to avoid blocking the shell).
 - To create a mod, name your executable mod.exe and place it with any dependencies in a unique folder inside the `mods` directory.
 - The shell will automatically detect and run any executables named "mod.exe" in folders inside the `mods` folder.
+- Mods are disabled by default but can be enabled in the configuration window or by one of the config commands.
+- Mods are just what I decided to call them. They are more like scripts that run on startup.
 Example structure:
 ```
 openadbshell/
@@ -120,10 +129,10 @@ openadbshell/
       
 ```
 
-## For mod developers
+## For mod makers
 - Mods function as described above. Refer to the included rich presence mod for an example.
 - Note: The working directory for all mods is the directory of the shell executable (i.e., where `openadbshell.exe` is located).
-- There are two data files that may be useful to developers (both are found in the `mods` directory):
+- There are two data files that may be useful to makers (both are found in the `mods` directory):
     - `running.dat` - The shell writes the current datetime() to this file every 10 seconds while the shell is running. If the shell stops writing to this file, it means the shell has exited.
     - `devices.dat` - The shell writes the number of connected devices to this file every 10 seconds while the shell is running.
 

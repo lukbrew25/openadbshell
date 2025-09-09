@@ -2,6 +2,7 @@
 This script is a simple command-line interface for
 interacting with ADB (Android Debug Bridge).
 """
+import shutil
 # pyinstaller --icon openadbshell.ico --add-data "LICENSE;."
 # --add-data "README.MD;." --add-data "contributing.md;." openadbshell.py
 # ico file not included in the repository, please create your own icon file
@@ -552,7 +553,7 @@ load_config()
 if rich_presence_exists:
     Thread(target=update_rich_presence, daemon=True).start()
 Thread(target=mod_running_check, daemon=True).start()
-print("Welcome to OpenADB Shell! (v2)")
+print("Welcome to OpenADB Shell! (v2.1)")
 print("Type 'help' for a list of shell-specific commands or type standard adb commands directly "
       "without the adb.exe prefix.")
 print("--------------------------------------------")
@@ -601,6 +602,103 @@ while True:
     user_command = str(input("openadbshell:"))
     if user_command.lower() == "config":
         open_config_window()
+    elif user_command.lower == "config rich_presence enable":
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("rich_presence"):
+                    f.write("rich_presence=True\n")
+                else:
+                    f.write(line)
+        rich_presence = True
+        print("Rich presence capability enabled.")
+    elif user_command.lower() == "config rich_presence disable":
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("rich_presence"):
+                    f.write("rich_presence=False\n")
+                else:
+                    f.write(line)
+        rich_presence = False
+        print("Rich presence disabled.")
+    elif user_command.lower() == "config rich_presence delete":
+        print("Deleting rich presence itself is highly discouraged. "
+              "You will not be able to re-enable. " 
+              "Are you sure you want to permanently delete this functionality? (y/n)")
+        do_deletion = input()
+        if do_deletion.lower() == "y":
+            if os.path.exists("mods/rich_presence"):
+                os.remove("mods/rich_presence/mod.exe")
+                os.remove("mods/rich_presence/presence.exe")
+            print("Rich presence deleted. You must re-install openadbshell to regain this functionality. "
+                  "Config menus may still behave like this function exists.")
+        else:
+            print("Rich presence deletion cancelled.")
+    elif user_command.lower() == "config do_cust_command enable":
+        do_cust_command = True
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("do_cust_command"):
+                    f.write("do_cust_command=True\n")
+        print("Custom command capability enabled.")
+    elif user_command.lower() == "config do_cust_command disable":
+        do_cust_command = False
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("do_cust_command"):
+                    f.write("do_cust_command=False\n")
+                else:
+                    f.write(line)
+        print("Custom command functionality disabled. Shell now limited to config and adb functions.")
+    elif user_command.lower() == "config do_mods enable":
+        do_mods = True
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("do_mods"):
+                    f.write("do_mods=True\n")
+                else:
+                    f.write(line)
+        print("Mod functionality enabled.")
+    elif user_command.lower() == "config do_mods disable":
+        do_mods = False
+        with open("config.dat", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            f.close()
+        with open("config.dat", "w", encoding="utf-8") as f:
+            for line in lines:
+                if line.startswith("do_mods"):
+                    f.write("do_mods=False\n")
+        print("Mod functionality disabled.")
+    elif user_command.lower().startswith("config adb_path "):
+        new_path = user_command.lower()[16:].strip()
+        if os.path.exists(new_path):
+            with open("config.dat", "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                f.close()
+            with open("config.dat", "w", encoding="utf-8") as f:
+                for line in lines:
+                    if line.startswith("adb_path"):
+                        f.write(f"adb_path={new_path}\n")
+                    else:
+                        f.write(line)
+            adb_path = new_path
+            print(f"ADB executable path changed to {new_path}.")
+        else:
+            print("The new path does not exist.")
     elif do_cust_command and user_command.lower() == "exit":
         disconnect = input("Would you like to disconnect from all devices before "
                            "exiting? (y/n): ")
@@ -642,6 +740,10 @@ while True:
         print("  config - Open the configuration window to enable/disable "
               "custom commands and manage saved devices with autoconnect. "
               "This command will always be available")
+        print("  config rich_presence <enable/disable/delete> - Config Rich Presence support")
+        print("  config do_cust_command <enable/disable> - Enable/disable custom commands")
+        print("  config do_mods <enable/disable> - Enable/disable mods")
+        print("  config adb_path <path> - Set the path to the adb executable")
         print("  exit - Exit the adb shell")
         print("  clear - Clear the console")
         print("  help - Show this help message")
