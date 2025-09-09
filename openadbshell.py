@@ -2,7 +2,6 @@
 This script is a simple command-line interface for
 interacting with ADB (Android Debug Bridge).
 """
-import shutil
 # pyinstaller --icon openadbshell.ico --add-data "LICENSE;."
 # --add-data "README.MD;." --add-data "contributing.md;." openadbshell.py
 # ico file not included in the repository, please create your own icon file
@@ -602,7 +601,7 @@ while True:
     user_command = str(input("openadbshell:"))
     if user_command.lower() == "config":
         open_config_window()
-    elif user_command.lower == "config rich_presence enable":
+    elif user_command.lower() == "config rich_presence enable":
         with open("config.dat", "r", encoding="utf-8") as f:
             lines = f.readlines()
             f.close()
@@ -635,7 +634,8 @@ while True:
             if os.path.exists("mods/rich_presence"):
                 os.remove("mods/rich_presence/mod.exe")
                 os.remove("mods/rich_presence/presence.exe")
-            print("Rich presence deleted. You must re-install openadbshell to regain this functionality. "
+            print("Rich presence deleted. You must re-install "
+                  "openadbshell to regain this functionality. "
                   "Config menus may still behave like this function exists.")
         else:
             print("Rich presence deletion cancelled.")
@@ -660,7 +660,8 @@ while True:
                     f.write("do_cust_command=False\n")
                 else:
                     f.write(line)
-        print("Custom command functionality disabled. Shell now limited to config and adb functions.")
+        print("Custom command functionality disabled. "
+              "Shell now limited to config and adb functions.")
     elif user_command.lower() == "config do_mods enable":
         do_mods = True
         with open("config.dat", "r", encoding="utf-8") as f:
