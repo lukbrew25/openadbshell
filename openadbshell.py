@@ -161,7 +161,7 @@ def open_config_window():  # pylint: disable=too-many-statements
         if not os.path.exists(adb_path):
             messagebox.showerror("Error", "Selected ADB executable not "
                                           "found. Resetting to default.")
-            adb_path_var.set("os.path.join("adb", "adb.exe")")
+            adb_path_var.set(os.path.join("adb", "adb.exe"))
         save_config()
 
         # Save devices from the table
