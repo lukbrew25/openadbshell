@@ -16,7 +16,7 @@ import datetime
 from threading import Thread, Event
 
 
-adb_path = "os.path.join("adb", "adb.exe")"
+adb_path = os.path.join("adb", "adb.exe")
 
 
 def save_config():
@@ -377,7 +377,7 @@ def open_config_window():  # pylint: disable=too-many-statements
             do_cust_command = True
             rich_presence = True
             do_mods = False
-            adb_path = "os.path.join("adb", "adb.exe")"
+            adb_path = os.path.join("adb", "adb.exe")
             cust_command_var.set(do_cust_command)
             rich_presence_var.set(rich_presence)
             do_mods_var.set(do_mods)
