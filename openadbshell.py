@@ -198,7 +198,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     def add_device():
         """Add a new empty row to the device table."""
-        device_tree.insert('', 'end', values=('', '', 'N'))
+        device_tree.insert('', 'end', values=('EXAMPLE_NAME', 'IP:PORT', 'N'))
 
     def delete_selected_device():
         """Delete the selected device from the table."""
