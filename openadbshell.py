@@ -16,7 +16,7 @@ import datetime
 from threading import Thread, Event
 
 
-adb_path = "adb\\adb.exe"
+adb_path = os.path.join("adb", "adb.exe")
 
 
 def save_config():
@@ -161,7 +161,7 @@ def open_config_window():  # pylint: disable=too-many-statements
         if not os.path.exists(adb_path):
             messagebox.showerror("Error", "Selected ADB executable not "
                                           "found. Resetting to default.")
-            adb_path_var.set("adb\\adb.exe")
+            adb_path_var.set(os.path.join("adb", "adb.exe"))
         save_config()
 
         # Save devices from the table
@@ -198,7 +198,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     def add_device():
         """Add a new empty row to the device table."""
-        device_tree.insert('', 'end', values=('', '', 'N'))
+        device_tree.insert('', 'end', values=('EXAMPLE_NAME', 'IP:PORT', 'N'))
 
     def delete_selected_device():
         """Delete the selected device from the table."""
@@ -248,7 +248,7 @@ def open_config_window():  # pylint: disable=too-many-statements
 
     def reset_adb():
         """Reset the ADB path to the default relative path."""
-        adb_path_var.set("adb\\adb.exe")
+        adb_path_var.set(os.path.join("adb", "adb.exe"))
 
     def set_to_path():
         """Set the ADB path to just 'adb' to use the system PATH."""
@@ -377,7 +377,7 @@ def open_config_window():  # pylint: disable=too-many-statements
             do_cust_command = True
             rich_presence = True
             do_mods = False
-            adb_path = "adb\\adb.exe"
+            adb_path = os.path.join("adb", "adb.exe")
             cust_command_var.set(do_cust_command)
             rich_presence_var.set(rich_presence)
             do_mods_var.set(do_mods)
